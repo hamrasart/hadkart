@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hadkart - Digital, Physical & Service Store</title>
+    <!-- Preconnect for Faster Loading -->
+    <link rel="preconnect" href="https://script.google.com">
+    <link rel="preconnect" href="https://script.googleusercontent.com">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Razorpay Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body { background-color: #f5f5f7; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; overflow-x: hidden; }
+        .modal { transition: opacity 0.3s ease, transform 0.3s ease; }
+        .modal-hidden { opacity: 0; pointer-events: none; transform: scale(0.95); }
+        .apple-glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
+        .apple-card { background: #ffffff; border-radius: 18px; border: 1px solid rgba(0,0,0,0.04); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease; }
+        .apple-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.07); }
+        .apple-btn { background-color: #0071e3; color: white; border-radius: 980px; transition: all 0.2s ease; }
+        .apple-btn:hover { background-color: #0077ed; transform: scale(1.02); }
+        
+        .banner-slide { animation: slideInRight 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideInRight {
+            from { opacity: 0.3; transform: translateX(35px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.45; }
+        }
+        .skeleton { animation: pulse 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite; background-color: #e5e5ea; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+    <!-- Top Minimalist Contact Banner & Navigation -->
+    <header class="sticky top-0 z-40 apple-glass border-b border-slate-200/60">
+        <div class="bg-[#1d1d1f] text-[#f5f5f7] text-xs py-2 px-4 text-center font-normal flex flex-col sm:flex-row items-center justify-center gap-2">
+            <span class="font-light">Looking for 3D plans, Home design or Construction works?</span>
+            <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20discuss%20regarding%203D%20plans%20and%20construction%20works." target="_blank" class="bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium px-3.5 py-1 rounded-full text-[11px] inline-flex items-center gap-1.5 transition">
+                <i class="fa-brands fa-whatsapp text-sm"></i> Contact Now
+            </a>
+        </div>
+        <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between gap-4">
+            <a href="#" onclick="showSection('store'); return false;" class="text-xl font-medium tracking-tight text-[#1d1d1f] flex items-center gap-2.5">
+                <img id="brandLogoImg" src="logo.png" onerror="this.src='https://via.placeholder.com/64/0071e3/ffffff?text=H'" alt="hadkart logo" class="w-8 h-8 rounded-lg object-cover shadow-sm">
+                <span class="lowercase tracking-normal font-semibold text-lg">hadkart</span>
+            </a>
+
+            <!-- Desktop Search Bar -->
+            <div class="flex-1 max-w-sm relative hidden md:block">
+                <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search products, 3d plans, e-books..." class="w-full pl-9 pr-4 py-1.5 bg-[#e8e8ed] border-0 rounded-full text-xs text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50 transition">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+            </div>
+
+            <!-- Nav Actions -->
+            <div class="flex items-center gap-3">
+                <button onclick="openWishlistModal()" class="relative text-[#1d1d1f] hover:text-[#0071e3] p-2 transition" title="Wishlist">
+                    <i class="fa-regular fa-heart text-lg"></i>
+                    <span id="wishlistBadge" class="absolute top-1 right-1 bg-[#ff3b30] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
+                </button>
+                <button onclick="openCartModal()" class="relative bg-[#e8e8ed] hover:bg-[#d2d2d7] text-[#1d1d1f] px-3.5 py-1.5 rounded-full font-medium text-xs flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span id="cartCount">0</span>
+                </button>
+                <button onclick="openLoginModal()" class="bg-[#1d1d1f] text-white hover:bg-black px-4 py-1.5 rounded-full font-medium text-xs transition">
+                    Account
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Search -->
+        <div class="p-3 apple-glass border-t border-slate-200/40 md:hidden">
+            <div class="relative">
+                <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full pl-9 pr-4 py-1.5 bg-[#e8e8ed] border-0 rounded-full text-xs text-[#1d1d1f] focus:outline-none">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+
+        <!-- STORE SECTION -->
+        <div id="storeSection">
+            
+            <!-- TOP BANNERS -->
+            <div id="topBannersWrapper" class="mb-10 space-y-4">
+                <div id="topMainBannerContainer">
+                    <div class="w-full h-48 md:h-72 rounded-2xl skeleton"></div>
+                </div>
+                <div id="topSlimBannerContainer">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="w-full h-28 md:h-40 rounded-2xl skeleton"></div>
+                        <div class="w-full h-28 md:h-40 rounded-2xl skeleton"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Explore Products Header & Sort -->
+            <div id="exploreHeader" class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-slate-200/60 pb-4">
+                <div>
+                    <h1 class="text-3xl font-semibold tracking-tight text-[#1d1d1f]">Explore Products.</h1>
+                    <p class="text-xs text-slate-500 mt-0.5">Browse digital publications, architectural blueprints, and expert services.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <label for="sortDropdown" class="text-xs font-medium text-slate-500">Sort by:</label>
+                    <select id="sortDropdown" onchange="handleSortChange()" class="px-3.5 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#0071e3]">
+                        <option value="default">Featured</option>
+                        <option value="low-high">Price: Low to High</option>
+                        <option value="high-low">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="apple-card bg-white p-4 h-80 skeleton rounded-2xl"></div>
+                <div class="apple-card bg-white p-4 h-80 skeleton rounded-2xl"></div>
+                <div class="apple-card bg-white p-4 h-80 skeleton rounded-2xl"></div>
+                <div class="apple-card bg-white p-4 h-80 skeleton rounded-2xl"></div>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div id="paginationContainer" class="flex justify-center items-center flex-wrap gap-2 mt-12"></div>
+
+            <!-- BOTTOM BANNERS -->
+            <div id="bottomBannersWrapper" class="mt-14 space-y-4">
+                <div id="bottomMainBannerContainer"></div>
+                <div id="bottomSlimBannerContainer"></div>
+            </div>
+        </div>
+
+        <!-- PRODUCT DETAILS VIEW -->
+        <div id="productDetailSection" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="showSection('store')" class="text-[#0071e3] hover:underline text-xs font-medium flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Store
+                </button>
+                <button onclick="copyCurrentProductLink()" class="bg-white hover:bg-slate-100 text-[#1d1d1f] border border-slate-200 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-share-nodes"></i> Share Link
+                </button>
+            </div>
+            <div id="productDetailContent" class="apple-card p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10"></div>
+            
+            <div class="mt-14">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-xl font-semibold text-[#1d1d1f]">More Products to Explore.</h3>
+                    <span class="text-[11px] text-slate-400">Swipe to view <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                </div>
+                <div id="relatedProductsGrid" class="flex gap-5 overflow-x-auto no-scrollbar pb-4"></div>
+            </div>
+
+            <div id="recentlyViewedContainer" class="mt-12 hidden">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-xl font-semibold text-[#1d1d1f]">Recently Viewed.</h3>
+                </div>
+                <div id="recentlyViewedGrid" class="flex gap-5 overflow-x-auto no-scrollbar pb-4"></div>
+            </div>
+        </div>
+
+        <!-- MY ACCOUNT DASHBOARD -->
+        <div id="accountSection" class="hidden max-w-3xl mx-auto apple-card p-8">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                <h2 class="text-2xl font-semibold text-[#1d1d1f]">Account Dashboard</h2>
+                <button onclick="logoutUser()" class="text-[#ff3b30] hover:underline text-xs font-medium">Sign Out</button>
+            </div>
+            <div id="accountProfileInfo" class="mb-6 bg-[#f5f5f7] p-4 rounded-xl text-xs space-y-1"></div>
+            <h3 class="text-sm font-semibold text-[#1d1d1f] mb-4">Purchased Orders & Access Links</h3>
+            <div id="accountOrdersList" class="space-y-4"></div>
+        </div>
+
+        <!-- LEGAL PAGES -->
+        <div id="legalSection" class="hidden max-w-3xl mx-auto apple-card p-8">
+            <button onclick="showSection('store')" class="mb-6 text-[#0071e3] hover:underline text-xs font-medium flex items-center gap-1">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <div id="legalContent"></div>
+        </div>
+    </main>
+
+    <!-- Save to Phone Home Screen Widget -->
+    <section class="max-w-7xl mx-auto px-6 my-8 w-full">
+        <div class="apple-card p-6 bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+            <div class="flex flex-col md:flex-row items-center gap-4">
+                <img src="logo.png" onerror="this.src='https://via.placeholder.com/64/0071e3/ffffff?text=H'" alt="hadkart app icon" class="w-12 h-12 rounded-xl shadow-md object-cover" loading="lazy">
+                <div>
+                    <h3 class="text-sm font-semibold text-[#1d1d1f] mb-1">Save hadkart to your Phone Home Screen</h3>
+                    <p class="text-xs text-slate-500">Access hadkart instantly like an app! In iPhone Safari, tap the <strong>Share</strong> button and select <strong>'Add to Home Screen'</strong>.</p>
+                </div>
+            </div>
+            <button onclick="triggerInstallPrompt()" class="apple-btn px-5 py-2.5 text-xs font-medium shrink-0 shadow-sm">
+                <i class="fa-solid fa-bookmark mr-1.5"></i> Save to Home Screen
+            </button>
+        </div>
+    </section>
+
+    <!-- WhatsApp Support Widget -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <div id="whatsappPopupBox" class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 mb-3 w-64 text-right hidden transition-all duration-300">
+            <div class="flex justify-between items-center mb-2 border-b pb-1.5">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Quick Assistance</span>
+                <button onclick="toggleWhatsappPopup()" class="text-slate-400 hover:text-slate-700 text-sm"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs font-semibold text-[#1d1d1f] mb-3 text-left">Need a Plan or 3D Design, or have product doubts?</p>
+            <div class="space-y-2">
+                <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20need%20assistance%20with%20my%20architectural%20designs%20and%20orders." target="_blank" class="w-full bg-[#34c759] hover:bg-[#30b552] text-white py-2 px-3 rounded-xl text-xs font-medium flex items-center justify-center gap-2 shadow-sm transition">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> Chat on WhatsApp
+                </a>
+                <a href="tel:+917907383944" class="w-full bg-[#1d1d1f] hover:bg-black text-white py-2 px-3 rounded-xl text-xs font-medium flex items-center justify-center gap-2 shadow-sm transition">
+                    <i class="fa-solid fa-phone text-xs"></i> Call Directly
+                </a>
+            </div>
+        </div>
+        <button onclick="toggleWhatsappPopup()" class="bg-[#34c759] hover:bg-[#30b552] text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl transition hover:scale-110" title="Open Support Menu">
+            <i class="fa-brands fa-whatsapp"></i>
+        </button>
+    </div>
+
+    <!-- Exit Popup Modal -->
+    <div id="exitPopup" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 modal modal-hidden">
+        <div class="bg-white max-w-sm w-full p-6 rounded-3xl shadow-2xl relative text-center border border-slate-100">
+            <button onclick="closeExitPopup()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <div class="w-14 h-14 bg-[#0071e3]/10 text-[#0071e3] rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-drafting-compass"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-[#1d1d1f] mb-2 tracking-tight">Building Your Dream Home?</h3>
+            <p class="text-slate-500 text-xs mb-6 leading-relaxed">നിങ്ങൾ സ്വന്തമായിട്ട് പ്ലാനും ത്രീഡിയും വീടിന്റെ കൺസ്ട്രക്ഷൻ അല്ലെങ്കിൽ ഇന്റീരിയർ വർക്ക് ഇങ്ങനെ ചെയ്യാൻ നോക്കുന്നവരാണെങ്കിൽ ഡയറക്റ്റ് ഡിസൈൻ ടീമിനെ കോൺടാക്ട് ചെയ്യാം!</p>
+            <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20consult%20for%20my%20home%20design%20and%20construction." target="_blank" class="w-full apple-btn py-2.5 px-4 text-xs font-medium flex items-center justify-center gap-2 transition shadow-sm">
+                <i class="fa-brands fa-whatsapp text-sm"></i> Chat with Design Team
+            </a>
+        </div>
+    </div>
+
+    <!-- CART SIDEBAR MODAL -->
+    <div id="cartModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden flex justify-end">
+        <div class="bg-white w-full max-w-md h-full p-6 flex flex-col shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                <h2 class="text-lg font-semibold text-[#1d1d1f]">Review Bag</h2>
+                <button onclick="closeCartModal()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="cartItemsList" class="flex-1 overflow-y-auto py-4 space-y-4 text-xs"></div>
+            <div class="border-t border-slate-100 pt-4 space-y-3">
+                <div class="flex gap-2">
+                    <input type="text" id="couponInput" placeholder="Promo code" class="flex-1 px-3 py-1.5 bg-[#f5f5f7] border-0 rounded-xl text-xs uppercase focus:ring-1 focus:ring-[#0071e3]">
+                    <button onclick="applyCoupon()" class="bg-[#1d1d1f] text-white px-3 py-1.5 rounded-xl text-xs font-medium">Apply</button>
+                </div>
+                <div id="couponMessage" class="text-[11px]"></div>
+                <div class="flex justify-between text-sm font-semibold text-[#1d1d1f]">
+                    <span>Total:</span>
+                    <span id="cartTotalPrice">₹0</span>
+                </div>
+                <button onclick="proceedToCheckout()" class="w-full apple-btn py-3 text-xs font-medium transition shadow-sm">Check Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full p-6 rounded-3xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-lg font-semibold text-[#1d1d1f] mb-4">Checkout Details</h2>
+            <form id="checkoutForm" onsubmit="handleRazorpayPayment(event)" class="space-y-4 text-xs">
+                <div id="nameFieldContainer" class="hidden">
+                    <label class="block font-medium text-slate-600 mb-1">Full Name</label>
+                    <input type="text" id="checkoutName" placeholder="Enter your name" class="w-full px-3 py-2 bg-[#f5f5f7] border-0 rounded-xl focus:ring-1 focus:ring-[#0071e3]">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-600 mb-1">Email Address (Access details will be sent here)</label>
+                    <input type="email" id="checkoutEmail" required placeholder="yourname@email.com" class="w-full px-3 py-2 bg-[#f5f5f7] border-0 rounded-xl focus:ring-1 focus:ring-[#0071e3]">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-600 mb-1">WhatsApp / Phone Number</label>
+                    <input type="tel" id="checkoutPhone" required placeholder="10-digit mobile number" class="w-full px-3 py-2 bg-[#f5f5f7] border-0 rounded-xl focus:ring-1 focus:ring-[#0071e3]">
+                </div>
+                <div id="addressFieldContainer" class="hidden">
+                    <label class="block font-medium text-slate-600 mb-1">Delivery Address (Required for Physical Items)</label>
+                    <textarea id="checkoutAddress" rows="3" placeholder="House Name, Post, District, PIN Code" class="w-full px-3 py-2 bg-[#f5f5f7] border-0 rounded-xl focus:ring-1 focus:ring-[#0071e3]"></textarea>
+                </div>
+                <div class="flex items-center justify-center gap-4 py-2 bg-[#f5f5f7] rounded-xl text-[11px] text-slate-500 font-medium">
+                    <span><i class="fa-solid fa-lock text-[#34c759] mr-1"></i> 100% Secure Payment</span>
+                </div>
+                <button type="submit" id="payButton" class="w-full apple-btn py-3.5 font-medium transition shadow-sm">Pay</button>
+                <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20am%20facing%20issues%20with%20payment%20on%20checkout.%20Please%20help." target="_blank" class="w-full bg-[#34c759] hover:bg-[#30b552] text-white py-2.5 px-3 rounded-full font-medium text-xs flex items-center justify-center gap-2 shadow-sm transition">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> Having payment issue? Chat on WhatsApp
+                </a>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white max-w-sm w-full p-6 rounded-3xl shadow-2xl relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-lg font-semibold text-[#1d1d1f] mb-1">Sign in to Account</h2>
+            <p class="text-slate-500 text-[11px] mb-4">Enter the password sent to your email after your purchase.</p>
+            <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-medium text-slate-600 mb-1">Email Address</label>
+                    <input type="email" id="loginEmail" required class="w-full px-3 py-2 bg-[#f5f5f7] border-0 rounded-xl focus:ring-1 focus:ring-[#0071e3]">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-600 mb-1">Password</label>
+                    <input type="password" id="loginPassword" required class="w-full px-3 py-2 bg-[#f5f5f7] border-0 rounded-xl focus:ring-1 focus:ring-[#0071e3]">
+                </div>
+                <button type="submit" class="w-full bg-[#1d1d1f] text-white hover:bg-black py-3 rounded-full font-medium transition">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200/60 mt-16 py-12 text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+                <h4 class="font-semibold text-[#1d1d1f] mb-2 text-sm lowercase">hadkart</h4>
+                <p class="text-[11px] text-slate-500 leading-relaxed">Professional architectural designs, digital guides, and lifestyle products curated for modern living.</p>
+            </div>
+            <div>
+                <h4 class="font-semibold text-[#1d1d1f] mb-2">Quick Links</h4>
+                <ul class="space-y-1.5 text-[11px]">
+                    <li><a href="#" onclick="showSection('store'); return false;" class="hover:underline">Store Home</a></li>
+                    <li><a href="#" onclick="openLoginModal(); return false;" class="hover:underline">My Account</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-semibold text-[#1d1d1f] mb-2">Legal & Policies</h4>
+                <ul class="space-y-1.5 text-[11px]">
+                    <li><a href="#" onclick="loadLegalPage('privacy'); return false;" class="hover:underline">Privacy Policy</a></li>
+                    <li><a href="#" onclick="loadLegalPage('terms'); return false;" class="hover:underline">Terms & Conditions</a></li>
+                    <li><a href="#" onclick="loadLegalPage('shipping'); return false;" class="hover:underline">Shipping & Delivery</a></li>
+                    <li><a href="#" onclick="loadLegalPage('refund'); return false;" class="hover:underline">Refund & Cancellation</a></li>
+                    <li><a href="#" onclick="loadLegalPage('contact'); return false;" class="hover:underline">Contact Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-semibold text-[#1d1d1f] mb-2">Connect</h4>
+                <div class="flex gap-3 text-base mb-3">
+                    <a href="https://instagram.com/hamrasart" target="_blank" class="text-slate-600 hover:text-[#0071e3] transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.youtube.com/@hamrasart9166" target="_blank" class="text-slate-600 hover:text-[#ff3b30] transition"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="https://wa.me/917907383944" target="_blank" class="text-slate-600 hover:text-[#34c759] transition"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+                <p class="text-[11px]">Email: info@hadkart.com</p>
+                <p class="text-[11px] mt-0.5">Phone: +91 7907383944</p>
+            </div>
+        </div>
+        <div class="text-center border-t border-slate-100 pt-6 text-[11px] text-slate-400">
+            &copy; 2026 hadkart. All rights reserved. Designed with Apple-grade aesthetics.
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const RAZORPAY_LIVE_KEY = "rzp_live_3crrlxJYnfWJo9"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0fYOZ4JS-7ISvajLHiNxi4kvdqDB298NKfWisB6zYQ0a-8waQkg5DDsoOfFgzostHmw/exec";
+        
+        let allProducts = [];
+        let allBanners = [];
+        let cart = [];
+        let wishlist = JSON.parse(localStorage.getItem('hadkart_wishlist')) || [];
+        let recentlyViewed = JSON.parse(localStorage.getItem('hadkart_recent')) || [];
+        let currentSort = "default";
+        let searchQuery = "";
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 16;
+        let appliedCouponCode = "";
+        let discountAmount = 0;
+        let currentActiveProductId = null;
+        let deferredPrompt = null;
+        let bannerIntervals = [];
+
+        function parsePrice(val) {
+            if (val === undefined || val === null) return 0;
+            const cleaned = String(val).replace(/[^0-9.]/g, '');
+            return Number(cleaned) || 0;
+        }
+
+        function getDesc(p) {
+            return p['Product Description'] || p['Description'] || '';
+        }
+
+        function getBadgeText(p) {
+            return p['Custom Badge'] || p['Badge Text'] || '';
+        }
+
+        function getBadgeColorClass(p) {
+            const color = String(p['Badge Color'] || '').toLowerCase().trim();
+            if (color === 'red') return 'bg-[#ff3b30]';
+            if (color === 'green') return 'bg-[#34c759]';
+            if (color === 'orange' || color === 'yellow') return 'bg-[#ff9500]';
+            if (color === 'purple') return 'bg-[#af52de]';
+            if (color === 'black' || color === 'dark') return 'bg-[#1d1d1f]';
+            return 'bg-[#0071e3]';
+        }
+
+        function getFirstImage(p) {
+            const raw = p['Image URLs'] || p['Image URL'] || '';
+            if (!raw) return 'https://via.placeholder.com/400x300?text=hadkart';
+            return String(raw).split(',')[0].trim();
+        }
+
+        function getBannerLink(b) {
+            return b['Redirect URL'] || b['Link URL'] || b['Link'] || b['URL'] || b['Target URL'] || '';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCachedStoreData();
+            fetchStoreData();
+            updateWishlistBadge();
+            initExitIntentAndTimer();
+            window.addEventListener('hashchange', checkUrlHash);
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+            });
+        });
+
+        function loadCachedStoreData() {
+            try {
+                const cached = localStorage.getItem('hadkart_store_cache_v2');
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed.products && parsed.products.length) {
+                        allProducts = parsed.products;
+                        allBanners = parsed.banners || [];
+                        renderProducts();
+                        renderBanners();
+                        checkUrlHash();
+                    }
+                }
+            } catch (e) {
+                console.warn("Cache read error:", e);
+            }
+        }
+
+        async function fetchStoreData() {
+            try {
+                const res = await fetch(SCRIPT_URL + "?action=getStoreData&t=" + Date.now());
+                const data = await res.json();
+                if (data.status === "success") {
+                    allProducts = (data.products || []).filter(p => p['Product ID'] || p['Product Name']);
+                    allBanners = data.banners || [];
+                    
+                    localStorage.setItem('hadkart_store_cache_v2', JSON.stringify({
+                        products: allProducts,
+                        banners: allBanners
+                    }));
+
+                    renderBanners();
+                    renderProducts();
+                    checkUrlHash();
+                }
+            } catch (err) {
+                console.error("Error loading store data:", err);
+            }
+        }
+
+        function renderBanners() {
+            bannerIntervals.forEach(clearInterval);
+            bannerIntervals = [];
+
+            const topMainEl = document.getElementById('topMainBannerContainer');
+            const topSlimEl = document.getElementById('topSlimBannerContainer');
+            const bottomMainEl = document.getElementById('bottomMainBannerContainer');
+            const bottomSlimEl = document.getElementById('bottomSlimBannerContainer');
+
+            if (!allBanners.length) {
+                topMainEl.innerHTML = '';
+                topSlimEl.innerHTML = '';
+                bottomMainEl.innerHTML = '';
+                bottomSlimEl.innerHTML = '';
+                return;
+            }
+
+            let topMain = [];
+            let topSlim = [];
+            let bottomMain = [];
+            let bottomSlim = [];
+
+            const hasExplicitPos = allBanners.some(b => b['Position'] || b['Section'] || b['Banner Type'] || b['Type']);
+
+            if (hasExplicitPos) {
+                allBanners.forEach(b => {
+                    const pos = String(b['Position'] || b['Section'] || b['Banner Type'] || b['Type'] || '').toLowerCase();
+                    if (pos.includes('top1') || pos.includes('top main') || pos === 'main' || pos === 'top') {
+                        topMain.push(b);
+                    } else if (pos.includes('top2') || pos.includes('top slim') || pos === 'slim') {
+                        topSlim.push(b);
+                    } else if (pos.includes('bottom1') || pos.includes('bottom main') || pos === 'bottom' || pos === 'footer') {
+                        bottomMain.push(b);
+                    } else if (pos.includes('bottom2') || pos.includes('bottom slim')) {
+                        bottomSlim.push(b);
+                    } else {
+                        topMain.push(b);
+                    }
+                });
+            } else {
+                if (allBanners.length === 1) {
+                    topMain = [allBanners[0]];
+                } else if (allBanners.length === 2) {
+                    topMain = [allBanners[0]];
+                    bottomMain = [allBanners[1]];
+                } else if (allBanners.length === 3) {
+                    topMain = [allBanners[0]];
+                    topSlim = [allBanners[1], allBanners[2]];
+                } else if (allBanners.length === 4) {
+                    topMain = [allBanners[0]];
+                    topSlim = [allBanners[1], allBanners[2]];
+                    bottomMain = [allBanners[3]];
+                } else if (allBanners.length === 5) {
+                    topMain = [allBanners[0]];
+                    topSlim = [allBanners[1], allBanners[2]];
+                    bottomSlim = [allBanners[3], allBanners[4]];
+                } else {
+                    topMain = [allBanners[0], allBanners[3]].filter(Boolean);
+                    topSlim = [allBanners[1], allBanners[2], allBanners[4], allBanners[5]].filter(Boolean);
+                    bottomMain = allBanners.slice(6, 8);
+                    bottomSlim = allBanners.slice(8);
+                    if (bottomMain.length === 0 && allBanners[5]) {
+                        bottomMain = [allBanners[5]];
+                    }
+                }
+            }
+
+            function buildSingleBannerCard(b, heightClass) {
+                if (!b) return '';
+                const img = b['Image URL'] || b['Image URLs'] || '';
+                const title = b['Banner Title'] || b['Title'] || 'Featured Banner';
+                const link = getBannerLink(b);
+                
+                if (link && link !== '#') {
+                    return `
+                        <a href="${link}" target="_blank" rel="noopener noreferrer" class="block w-full rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/60 banner-slide cursor-pointer hover:opacity-95 transition">
+                            <img src="${img}" alt="${title}" class="w-full ${heightClass} object-cover">
+                        </a>
+                    `;
+                }
+                return `
+                    <div class="w-full rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/60 banner-slide">
+                        <img src="${img}" alt="${title}" class="w-full ${heightClass} object-cover">
+                    </div>
+                `;
+            }
+
+            let topMainIdx = 0;
+            function renderTopMain() {
+                if (!topMain.length) { topMainEl.innerHTML = ''; return; }
+                const current = topMain[topMainIdx % topMain.length];
+                topMainEl.innerHTML = buildSingleBannerCard(current, 'h-48 md:h-72');
+            }
+            renderTopMain();
+            if (topMain.length > 1) {
+                bannerIntervals.push(setInterval(() => { topMainIdx++; renderTopMain(); }, 3500));
+            }
+
+            let topSlimIdx = 0;
+            function renderTopSlim() {
+                if (!topSlim.length) { topSlimEl.innerHTML = ''; return; }
+                if (topSlim.length === 1) {
+                    topSlimEl.innerHTML = buildSingleBannerCard(topSlim[0], 'h-28 md:h-40');
+                    return;
+                }
+                const leftB = topSlim[topSlimIdx % topSlim.length];
+                const rightB = topSlim[(topSlimIdx + 1) % topSlim.length];
+                topSlimEl.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${buildSingleBannerCard(leftB, 'h-28 md:h-40')}
+                        ${buildSingleBannerCard(rightB, 'h-28 md:h-40')}
+                    </div>
+                `;
+            }
+            renderTopSlim();
+            if (topSlim.length > 2) {
+                bannerIntervals.push(setInterval(() => { topSlimIdx += 2; renderTopSlim(); }, 4500));
+            }
+
+            let bottomMainIdx = 0;
+            function renderBottomMain() {
+                if (!bottomMain.length) { bottomMainEl.innerHTML = ''; return; }
+                const current = bottomMain[bottomMainIdx % bottomMain.length];
+                bottomMainEl.innerHTML = buildSingleBannerCard(current, 'h-44 md:h-64');
+            }
+            renderBottomMain();
+            if (bottomMain.length > 1) {
+                bannerIntervals.push(setInterval(() => { bottomMainIdx++; renderBottomMain(); }, 4000));
+            }
+
+            let bottomSlimIdx = 0;
+            function renderBottomSlim() {
+                if (!bottomSlim.length) { bottomSlimEl.innerHTML = ''; return; }
+                if (bottomSlim.length === 1) {
+                    bottomSlimEl.innerHTML = buildSingleBannerCard(bottomSlim[0], 'h-28 md:h-40');
+                    return;
+                }
+                const leftB = bottomSlim[bottomSlimIdx % bottomSlim.length];
+                const rightB = bottomSlim[(bottomSlimIdx + 1) % bottomSlim.length];
+                bottomSlimEl.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${buildSingleBannerCard(leftB, 'h-28 md:h-40')}
+                        ${buildSingleBannerCard(rightB, 'h-28 md:h-40')}
+                    </div>
+                `;
+            }
+            renderBottomSlim();
+            if (bottomSlim.length > 2) {
+                bannerIntervals.push(setInterval(() => { bottomSlimIdx += 2; renderBottomSlim(); }, 4500));
+            }
+        }
+
+        function handleSortChange() {
+            currentSort = document.getElementById('sortDropdown').value;
+            currentPage = 1;
+            renderProducts();
+        }
+
+        function handleSearch(val) {
+            searchQuery = String(val || '').toLowerCase().trim();
+            currentPage = 1;
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            let filtered = allProducts.filter(p => {
+                const name = String(p['Product Name'] || '').toLowerCase();
+                const desc = String(getDesc(p)).toLowerCase();
+                const tags = String(p['Tags'] || '').toLowerCase();
+                const cat = String(p['Category'] || '').toLowerCase();
+                return name.includes(searchQuery) || desc.includes(searchQuery) || tags.includes(searchQuery) || cat.includes(searchQuery);
+            });
+
+            if (currentSort === "low-high") {
+                filtered.sort((a, b) => parsePrice(a['Sale Price']) - parsePrice(b['Sale Price']));
+            } else if (currentSort === "high-low") {
+                filtered.sort((a, b) => parsePrice(b['Sale Price']) - parsePrice(a['Sale Price']));
+            }
+
+            const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const paginatedItems = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+            if (!paginatedItems.length) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 text-xs">No matching products found.</div>`;
+                document.getElementById('paginationContainer').innerHTML = '';
+                return;
+            }
+
+            grid.innerHTML = paginatedItems.map((p, index) => {
+                const prodId = p['Product ID'] || `ITEM-${index}`;
+                const isWishlisted = wishlist.includes(prodId);
+                const badgeText = getBadgeText(p);
+                const badgeColor = getBadgeColorClass(p);
+                const salePrice = parsePrice(p['Sale Price']);
+                const regPrice = parsePrice(p['Regular Price']);
+                const imgUrl = getFirstImage(p);
+                const descText = getDesc(p);
+
+                return `
+                    <div class="apple-card overflow-hidden flex flex-col justify-between group cursor-pointer" onclick="viewProductDetail('${prodId}')">
+                        <div class="relative overflow-hidden bg-slate-100 h-52">
+                            <img src="${imgUrl}" alt="${p['Product Name']}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" ${index < 4 ? 'fetchpriority="high"' : 'loading="lazy"'}>
+                            ${badgeText ? `<span class="absolute top-3 left-3 ${badgeColor} text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">${badgeText}</span>` : ''}
+                            <button onclick="event.stopPropagation(); toggleWishlist('${prodId}')" class="absolute top-3 right-3 w-7 h-7 bg-white/85 hover:bg-white rounded-full flex items-center justify-center text-slate-700 shadow-sm transition">
+                                <i class="fa-${isWishlisted ? 'solid text-[#ff3b30]' : 'regular'} fa-heart text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col justify-between bg-white">
+                            <div>
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="text-[10px] font-semibold uppercase tracking-wider text-[#0071e3]">${p['Product Type'] || 'Product'}</span>
+                                    ${p['Category'] ? `<span class="text-[10px] text-slate-400 truncate">${p['Category']}</span>` : ''}
+                                </div>
+                                <h3 class="font-semibold text-[#1d1d1f] text-sm mt-1 line-clamp-1">${p['Product Name']}</h3>
+                                <p class="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">${descText}</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                                <div>
+                                    ${regPrice > salePrice ? `<span class="text-[10px] text-slate-400 line-through">₹${regPrice.toLocaleString('en-IN')}</span>` : ''}
+                                    <div class="text-sm font-semibold text-[#1d1d1f]">₹${salePrice.toLocaleString('en-IN')}</div>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button onclick="event.stopPropagation(); addToCart('${prodId}')" class="bg-[#e8e8ed] hover:bg-[#d2d2d7] text-[#1d1d1f] px-2.5 py-1.5 rounded-full text-[11px] font-medium transition" title="Add to Bag">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                    </button>
+                                    <button onclick="event.stopPropagation(); buyNow('${prodId}')" class="apple-btn px-3 py-1.5 text-[11px] font-medium transition">
+                                        Buy Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('paginationContainer');
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            let html = `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled class="opacity-40 cursor-not-allowed px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-medium"' : 'class="px-3.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium transition"'}><i class="fa-solid fa-chevron-left mr-1 text-[10px]"></i> Prev</button>`;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button onclick="changePage(${i})" class="w-8 h-8 rounded-xl text-xs font-semibold transition ${currentPage === i ? 'bg-[#1d1d1f] text-white shadow-sm' : 'bg-white hover:bg-slate-100 border border-slate-200 text-[#1d1d1f]'}">${i}</button>`;
+            }
+            
+            html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled class="opacity-40 cursor-not-allowed px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-medium"' : 'class="px-3.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium transition"'}>Next <i class="fa-solid fa-chevron-right ml-1 text-[10px]"></i></button>`;
+            container.innerHTML = html;
+        }
+
+        function changePage(p) {
+            currentPage = p;
+            renderProducts();
+            const exploreEl = document.getElementById('exploreHeader');
+            if (exploreEl) {
+                exploreEl.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function viewProductDetail(id, updateHash = true) {
+            const product = allProducts.find(p => String(p['Product ID']) === String(id));
+            if (!product) return;
+
+            currentActiveProductId = id;
+            if (updateHash) {
+                window.location.hash = `product=${id}`;
+            }
+
+            recentlyViewed = recentlyViewed.filter(item => String(item['Product ID']) !== String(id));
+            recentlyViewed.unshift(product);
+            if (recentlyViewed.length > 10) recentlyViewed.pop();
+            localStorage.setItem('hadkart_recent', JSON.stringify(recentlyViewed));
+
+            document.getElementById('storeSection').classList.add('hidden');
+            document.getElementById('accountSection').classList.add('hidden');
+            document.getElementById('legalSection').classList.add('hidden');
+            document.getElementById('productDetailSection').classList.remove('hidden');
+
+            const badgeText = getBadgeText(product);
+            const badgeColor = getBadgeColorClass(product);
+            const salePrice = parsePrice(product['Sale Price']);
+            const regPrice = parsePrice(product['Regular Price']);
+            const imgUrl = getFirstImage(product);
+            const descText = getDesc(product) || 'No description available.';
+
+            document.getElementById('productDetailContent').innerHTML = `
+                <div class="bg-[#f5f5f7] rounded-2xl overflow-hidden flex items-center justify-center p-4 relative">
+                    ${badgeText ? `<span class="absolute top-6 left-6 ${badgeColor} text-white text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md">${badgeText}</span>` : ''}
+                    <img src="${imgUrl}" alt="${product['Product Name']}" class="w-full max-h-[400px] object-cover rounded-xl">
+                </div>
+                <div class="flex flex-col justify-between py-2">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">${product['Product Type'] || 'Product'}</span>
+                            ${product['Category'] ? `<span class="text-xs text-slate-400">• ${product['Category']}</span>` : ''}
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-semibold text-[#1d1d1f] mt-2 tracking-tight">${product['Product Name']}</h2>
+                        <div class="text-2xl font-semibold text-[#1d1d1f] my-4">
+                            ₹${salePrice.toLocaleString('en-IN')}
+                            ${regPrice > salePrice ? `<span class="text-sm text-slate-400 line-through font-normal ml-2">₹${regPrice.toLocaleString('en-IN')}</span>` : ''}
+                        </div>
+                        <p class="text-slate-600 text-xs leading-relaxed mb-8 whitespace-pre-line">${descText}</p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="addToCart('${product['Product ID']}'); openCartModal();" class="bg-[#e8e8ed] hover:bg-[#d2d2d7] text-[#1d1d1f] py-3.5 text-xs font-medium rounded-full transition">Add to Bag</button>
+                            <button onclick="buyNow('${product['Product ID']}')" class="apple-btn py-3.5 text-xs font-medium shadow-md">Buy Now</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const sameType = allProducts.filter(p => String(p['Product ID']) !== String(id) && (p['Category'] === product['Category'] || p['Product Type'] === product['Product Type']));
+            const others = allProducts.filter(p => String(p['Product ID']) !== String(id) && !(p['Category'] === product['Category'] || p['Product Type'] === product['Product Type']));
+            const combinedRelated = [...sameType, ...others].slice(0, 10);
+
+            const relatedGrid = document.getElementById('relatedProductsGrid');
+            if (!combinedRelated.length) {
+                relatedGrid.innerHTML = `<p class="text-xs text-slate-400">No other products in store yet.</p>`;
+            } else {
+                relatedGrid.innerHTML = combinedRelated.map(p => {
+                    const pSale = parsePrice(p['Sale Price']);
+                    const pBadge = getBadgeText(p);
+                    const pBadgeColor = getBadgeColorClass(p);
+                    return `
+                        <div onclick="viewProductDetail('${p['Product ID']}')" class="apple-card bg-white p-3.5 cursor-pointer min-w-[200px] max-w-[200px] flex-shrink-0 flex flex-col justify-between relative">
+                            <div class="relative h-32 bg-slate-100 rounded-xl overflow-hidden mb-3">
+                                <img src="${getFirstImage(p)}" class="w-full h-full object-cover" loading="lazy">
+                                ${pBadge ? `<span class="absolute top-2 left-2 ${pBadgeColor} text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase">${pBadge}</span>` : ''}
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-xs text-[#1d1d1f] line-clamp-1">${p['Product Name']}</h4>
+                                <div class="text-xs font-semibold text-[#0071e3] mt-1">₹${pSale.toLocaleString('en-IN')}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            renderRecentlyViewedSection();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderRecentlyViewedSection() {
+            const container = document.getElementById('recentlyViewedContainer');
+            const grid = document.getElementById('recentlyViewedGrid');
+            const filteredRecent = recentlyViewed.filter(p => String(p['Product ID']) !== String(currentActiveProductId));
+
+            if (!filteredRecent.length) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            grid.innerHTML = filteredRecent.map(p => {
+                const pSale = parsePrice(p['Sale Price']);
+                return `
+                    <div onclick="viewProductDetail('${p['Product ID']}')" class="apple-card bg-white p-3.5 cursor-pointer min-w-[190px] max-w-[190px] flex-shrink-0 flex flex-col justify-between">
+                        <img src="${getFirstImage(p)}" class="w-full h-28 object-cover rounded-xl mb-2.5" loading="lazy">
+                        <div>
+                            <h4 class="font-semibold text-xs text-[#1d1d1f] line-clamp-1">${p['Product Name']}</h4>
+                            <div class="text-xs font-semibold text-slate-600 mt-0.5">₹${pSale.toLocaleString('en-IN')}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleWishlist(id) {
+            if (wishlist.includes(id)) {
+                wishlist = wishlist.filter(item => item !== id);
+            } else {
+                wishlist.push(id);
+            }
+            localStorage.setItem('hadkart_wishlist', JSON.stringify(wishlist));
+            updateWishlistBadge();
+            renderProducts();
+        }
+
+        function updateWishlistBadge() {
+            const badge = document.getElementById('wishlistBadge');
+            if (wishlist.length > 0) {
+                badge.textContent = wishlist.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function openWishlistModal() {
+            searchQuery = "";
+            const grid = document.getElementById('productsGrid');
+            const wishItems = allProducts.filter(p => wishlist.includes(p['Product ID']));
+            showSection('store');
+            if (!wishItems.length) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 text-xs">Your wishlist is empty.</div>`;
+                document.getElementById('paginationContainer').innerHTML = '';
+                return;
+            }
+            grid.innerHTML = wishItems.map(p => {
+                const salePrice = parsePrice(p['Sale Price']);
+                return `
+                    <div class="apple-card overflow-hidden flex flex-col justify-between p-4 bg-white">
+                        <img src="${getFirstImage(p)}" onclick="viewProductDetail('${p['Product ID']}')" class="w-full h-40 object-cover rounded-xl mb-3 cursor-pointer" loading="lazy">
+                        <h3 class="font-semibold text-[#1d1d1f] text-xs line-clamp-1">${p['Product Name']}</h3>
+                        <div class="text-xs font-semibold text-[#1d1d1f] mt-1">₹${salePrice.toLocaleString('en-IN')}</div>
+                        <button onclick="addToCart('${p['Product ID']}')" class="w-full mt-3 apple-btn py-1.5 text-[11px] font-medium">Add to Bag</button>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('paginationContainer').innerHTML = '';
+        }
+
+        function copyCurrentProductLink() {
+            const currentUrl = window.location.href;
+            navigator.clipboard.writeText(currentUrl).then(() => {
+                alert("Product link copied to clipboard!");
+            });
+        }
+
+        function showSection(sec, updateHash = true) {
+            document.getElementById('storeSection').classList.add('hidden');
+            document.getElementById('productDetailSection').classList.add('hidden');
+            document.getElementById('accountSection').classList.add('hidden');
+            document.getElementById('legalSection').classList.add('hidden');
+
+            if (sec === 'store') {
+                document.getElementById('storeSection').classList.remove('hidden');
+                if (updateHash) window.location.hash = 'store';
+                renderProducts();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function addToCart(id) {
+            const product = allProducts.find(p => String(p['Product ID']) === String(id));
+            if (!product) return;
+            const existing = cart.find(item => String(item['Product ID']) === String(id));
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function buyNow(id) {
+            const product = allProducts.find(p => String(p['Product ID']) === String(id));
+            if (!product) return;
+            cart = [{ ...product, qty: 1 }];
+            updateCartUI();
+            proceedToCheckout();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.qty, 0);
+            const list = document.getElementById('cartItemsList');
+            if (!cart.length) {
+                list.innerHTML = `<p class="text-center text-slate-400 py-8 text-xs">Your bag is empty.</p>`;
+                document.getElementById('cartTotalPrice').textContent = '₹0';
+                return;
+            }
+            list.innerHTML = cart.map(item => {
+                const itemPrice = parsePrice(item['Sale Price']);
+                return `
+                    <div class="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                        <img src="${getFirstImage(item)}" class="w-12 h-12 object-cover rounded-lg" loading="lazy">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-[#1d1d1f] line-clamp-1">${item['Product Name']}</h4>
+                            <div class="text-slate-500">₹${itemPrice.toLocaleString('en-IN')} x ${item.qty}</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateQty('${item['Product ID']}', -1)" class="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center font-bold">-</button>
+                            <span class="font-medium">${item.qty}</span>
+                            <button onclick="updateQty('${item['Product ID']}', 1)" class="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center font-bold">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            calculateCartTotal();
+        }
+
+        function updateQty(id, delta) {
+            const item = cart.find(i => String(i['Product ID']) === String(id));
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => String(i['Product ID']) !== String(id));
+                }
+            }
+            updateCartUI();
+        }
+
+        function calculateCartTotal() {
+            let subtotal = cart.reduce((sum, item) => sum + (parsePrice(item['Sale Price']) * item.qty), 0);
+            let total = Math.max(0, subtotal - discountAmount);
+            document.getElementById('cartTotalPrice').textContent = `₹${total.toLocaleString('en-IN')}`;
+        }
+
+        function openCartModal() { document.getElementById('cartModal').classList.remove('hidden'); }
+        function closeCartModal() { document.getElementById('cartModal').classList.add('hidden'); }
+
+        async function applyCoupon() {
+            const code = document.getElementById('couponInput').value.trim();
+            const subtotal = cart.reduce((sum, item) => sum + (parsePrice(item['Sale Price']) * item.qty), 0);
+            if (!code) return;
+
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ action: "validateCoupon", code: code, cartTotal: subtotal })
+                });
+                const data = await res.json();
+                const msg = document.getElementById('couponMessage');
+                if (data.status === "success") {
+                    appliedCouponCode = data.couponCode;
+                    discountAmount = Number(data.discountAmount) || 0;
+                    msg.className = "text-[11px] text-[#34c759] font-medium";
+                    msg.textContent = `Promo applied! You saved ₹${discountAmount}`;
+                    calculateCartTotal();
+                } else {
+                    msg.className = "text-[11px] text-[#ff3b30] font-medium";
+                    msg.textContent = data.message;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function proceedToCheckout() {
+            if (!cart.length) return;
+            closeCartModal();
+            
+            const hasPhysicalOrService = cart.some(item => {
+                const t = String(item['Product Type']).toLowerCase();
+                return t === 'physical' || t === 'service';
+            });
+
+            const nameContainer = document.getElementById('nameFieldContainer');
+            const nameInput = document.getElementById('checkoutName');
+            const addressContainer = document.getElementById('addressFieldContainer');
+            const addressInput = document.getElementById('checkoutAddress');
+
+            if (hasPhysicalOrService) {
+                nameContainer.classList.remove('hidden');
+                nameInput.setAttribute('required', 'true');
+                addressContainer.classList.remove('hidden');
+                addressInput.setAttribute('required', 'true');
+            } else {
+                nameContainer.classList.add('hidden');
+                nameInput.removeAttribute('required');
+                nameInput.value = '';
+                addressContainer.classList.add('hidden');
+                addressInput.removeAttribute('required');
+                addressInput.value = '';
+            }
+
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
+
+        async function handleRazorpayPayment(e) {
+            e.preventDefault();
+            const hasPhysicalOrService = cart.some(item => {
+                const t = String(item['Product Type']).toLowerCase();
+                return t === 'physical' || t === 'service';
+            });
+
+            const name = hasPhysicalOrService ? (document.getElementById('checkoutName').value.trim() || "Valued Customer") : "Digital Customer";
+            const email = document.getElementById('checkoutEmail').value.trim();
+            const phone = document.getElementById('checkoutPhone').value.trim();
+            const address = hasPhysicalOrService ? (document.getElementById('checkoutAddress').value.trim() || "N/A") : "N/A (Digital Access)";
+
+            let subtotal = cart.reduce((sum, item) => sum + (parsePrice(item['Sale Price']) * item.qty), 0);
+            let finalPaid = Math.max(0, subtotal - discountAmount);
+
+            const purchasedItemIds = [];
+            cart.forEach(item => {
+                for (let q = 0; q < item.qty; q++) {
+                    purchasedItemIds.push(item['Product ID']);
+                }
+            });
+
+            if (finalPaid <= 0) {
+                await submitOrderBackend({
+                    name, email, phone, address,
+                    paymentId: "FREE-COUPON-" + Date.now(),
+                    totalPaid: 0,
+                    couponUsed: appliedCouponCode || "None",
+                    discountAmount: discountAmount,
+                    itemIds: purchasedItemIds
+                });
+                return;
+            }
+
+            const options = {
+                "key": RAZORPAY_LIVE_KEY,
+                "amount": Math.round(finalPaid * 100),
+                "currency": "INR",
+                "name": "hadkart",
+                "description": "Order Payment",
+                "image": "logo.png",
+                "handler": async function (response) {
+                    const btn = document.getElementById('payButton');
+                    btn.disabled = true;
+                    btn.textContent = "Verifying Order...";
+                    await submitOrderBackend({
+                        name, email, phone, address,
+                        paymentId: response.razorpay_payment_id,
+                        totalPaid: finalPaid,
+                        couponUsed: appliedCouponCode || "None",
+                        discountAmount: discountAmount,
+                        itemIds: purchasedItemIds
+                    });
+                    btn.disabled = false;
+                    btn.textContent = "Pay";
+                },
+                "prefill": {
+                    "name": name,
+                    "email": email,
+                    "contact": phone
+                },
+                "theme": { "color": "#0071e3" }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                alert("Payment Failed: " + (response.error.description || "Please try again."));
+            });
+            rzp.open();
+        }
+
+        async function submitOrderBackend(orderData) {
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ action: "createOrder", ...orderData })
+                });
+                const data = await res.json();
+                if (data.status === "success") {
+                    closeCheckoutModal();
+                    alert(`Payment & Order Successful!\n\nOrder ID: ${data.orderId}\nYour Account Password: ${data.password}\n\n(We have also sent your product access links & login details to your email!)`);
+                    cart = [];
+                    appliedCouponCode = "";
+                    discountAmount = 0;
+                    updateCartUI();
+                    showSection('store');
+                } else {
+                    alert("Order recorded issue: " + data.message + "\nPlease contact WhatsApp support with your Payment ID: " + orderData.paymentId);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Network error while saving order. Please contact WhatsApp support (+91 7907383944) with your Payment ID: " + orderData.paymentId);
+            }
+        }
+
+        function openLoginModal() { document.getElementById('loginModal').classList.remove('hidden'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ action: "userLogin", email, password })
+                });
+                const data = await res.json();
+                if (data.status === "success") {
+                    closeLoginModal();
+                    renderAccountDashboard(data.profile, data.orders);
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderAccountDashboard(profile, orders) {
+            document.getElementById('storeSection').classList.add('hidden');
+            document.getElementById('productDetailSection').classList.add('hidden');
+            document.getElementById('legalSection').classList.add('hidden');
+            document.getElementById('accountSection').classList.remove('hidden');
+
+            document.getElementById('accountProfileInfo').innerHTML = `
+                <div><strong>Name:</strong> ${profile.name}</div>
+                <div><strong>Email:</strong> ${profile.email}</div>
+                <div><strong>Phone:</strong> ${profile.phone}</div>
+                <div><strong>Address:</strong> ${profile.address}</div>
+            `;
+
+            const list = document.getElementById('accountOrdersList');
+            if (!orders.length) {
+                list.innerHTML = `<p class="text-slate-400 text-xs">No paid orders found.</p>`;
+                return;
+            }
+
+            list.innerHTML = orders.map(o => `
+                <div class="border border-slate-200 rounded-2xl p-4 bg-[#f5f5f7]">
+                    <div class="flex justify-between items-center mb-2 border-b border-slate-200/60 pb-2">
+                        <span class="font-semibold text-xs text-[#0071e3]">${o.orderId}</span>
+                        <span class="text-[11px] text-slate-500">${o.date} | Paid: ₹${o.totalPaid}</span>
+                    </div>
+                    <div class="space-y-2 mt-2">
+                        ${o.items.map(item => `
+                            <div class="bg-white p-3 rounded-xl border border-slate-100">
+                                <h4 class="font-semibold text-xs text-[#1d1d1f]">${item.productName}</h4>
+                                <p class="text-[11px] text-slate-600 mt-1 whitespace-pre-line bg-[#f5f5f7] p-2 rounded-lg"><strong>Access Link/Info:</strong>\n${item.welcomeMessage || 'N/A'}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function logoutUser() { showSection('store'); }
+
+        function toggleWhatsappPopup() {
+            const box = document.getElementById('whatsappPopupBox');
+            box.classList.toggle('hidden');
+        }
+
+        function triggerInstallPrompt() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+            } else {
+                alert("To add hadkart to your Home Screen:\n\n• On iPhone/iPad (Safari): Tap the Share button below and select 'Add to Home Screen'.\n• On Android (Chrome): Tap the menu dots (⋮) and select 'Add to Home Screen' or 'Install app'.");
+            }
+        }
+
+        function checkUrlHash() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#product=')) {
+                const prodId = hash.replace('#product=', '');
+                if (allProducts.length > 0) {
+                    viewProductDetail(prodId, false);
+                }
+            } else if (!hash || hash === '#store') {
+                showSection('store', false);
+            }
+        }
+
+        function initExitIntentAndTimer() {
+            let popupShown = false;
+            setTimeout(() => {
+                if (!popupShown) {
+                    document.getElementById('exitPopup').classList.remove('modal-hidden');
+                    popupShown = true;
+                }
+            }, 45000);
+
+            document.addEventListener('mouseleave', e => {
+                if (e.clientY < 10 && !popupShown) {
+                    popupShown = true;
+                    document.getElementById('exitPopup').classList.remove('modal-hidden');
+                }
+            });
+        }
+
+        function closeExitPopup() {
+            document.getElementById('exitPopup').classList.add('modal-hidden');
+        }
+
+        function loadLegalPage(type) {
+            document.getElementById('storeSection').classList.add('hidden');
+            document.getElementById('productDetailSection').classList.add('hidden');
+            document.getElementById('accountSection').classList.add('hidden');
+            document.getElementById('legalSection').classList.remove('hidden');
+
+            const content = document.getElementById('legalContent');
+            let title = "";
+            let html = "";
+
+            if (type === 'privacy') {
+                title = "Privacy Policy";
+                html = `
+                    <p>At hadkart, accessible from hadkart.com, your privacy is of paramount importance to us. This Privacy Policy document outlines the types of personal information that is collected and recorded by hadkart and how we use it.</p>
+                    <p><strong>Information We Collect:</strong> We collect personal information such as your name, email address, phone number, and delivery address strictly when you place an order or create an account for order fulfillment.</p>
+                    <p><strong>Use of Information:</strong> Your information is used solely to process transactions, deliver digital access or physical items, provide customer support via WhatsApp or phone, and send account access credentials.</p>
+                    <p><strong>Data Security:</strong> All online payments are securely processed through Razorpay gateways. We do not store your credit/debit card or banking details on our servers.</p>
+                `;
+            } else if (type === 'terms') {
+                title = "Terms & Conditions";
+                html = `
+                    <p>Welcome to hadkart. By accessing our website and purchasing our products, you agree to comply with and be bound by the following terms and conditions.</p>
+                    <p><strong>Digital Content & Access Policy:</strong> Most of our digital products, e-books, and architectural guides are delivered strictly via <strong>online view-only access</strong> through your customer account portal. Content is protected by copyright laws. Unauthorized reproduction, distribution, or resale is strictly prohibited.</p>
+                    <p><strong>Downloadable Files:</strong> Files are non-downloadable by default unless explicitly marked or authorized by hadkart for specific licensed items.</p>
+                    <p><strong>Pricing & Services:</strong> All prices listed are in Indian Rupees (INR) and are subject to change without notice. Architectural consultation services are subject to mutual project timelines discussed via WhatsApp or phone.</p>
+                `;
+            } else if (type === 'shipping') {
+                title = "Shipping & Delivery Policy";
+                html = `
+                    <p><strong>Digital Products & Services:</strong> Digital guides, e-books, and consultation packages are delivered instantly upon successful payment confirmation. Customers receive secure login credentials and access links directly via email and their account dashboard.</p>
+                    <p><strong>Physical Products:</strong> Physical items (such as printed hardcopy checklists or books) are processed and dispatched via reliable courier services within 2 to 3 working days. Standard delivery timelines range from 5 to 7 business days depending on the shipping location within India.</p>
+                `;
+            } else if (type === 'refund') {
+                title = "Refund & Cancellation Policy";
+                html = `
+                    <p><strong>No Refund Policy for Digital Goods:</strong> Due to the irrevocable nature of digital e-books, architectural publications, and online view-only media, <strong>all sales of digital products are final and non-refundable</strong> once access has been granted.</p>
+                    <p><strong>Cancellations:</strong> Orders for digital products or customized services cannot be cancelled once payment is processed and account access is provisioned.</p>
+                    <p><strong>Damaged Physical Goods:</strong> If you receive a physical product that is physically damaged or defective, you may report it to us within 48 hours of delivery along with photographic evidence, and we will arrange a replacement after verification.</p>
+                `;
+            } else if (type === 'contact') {
+                title = "Contact Us";
+                html = `
+                    <p>If you have any questions, concerns, or require assistance regarding our policies, products, or orders, please feel free to reach out to us:</p>
+                    <p><strong>Business Name:</strong> hadkart (HAD Architecture & Interiors)<br>
+                    <strong>Location:</strong> Tirur, Malappuram District, Kerala, India - 676101<br>
+                    <strong>Phone / WhatsApp:</strong> +91 7907383944<br>
+                    <strong>Email:</strong> info@hadkart.com</p>
+                `;
+            }
+
+            content.innerHTML = `<h2 class="text-2xl font-semibold text-[#1d1d1f] mb-4">${title}</h2><div class="text-slate-600 text-xs leading-relaxed space-y-3">${html}</div>`;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
