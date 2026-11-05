@@ -37,6 +37,12 @@
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes chatPop {
+            from { opacity: 0; transform: translateY(8px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .chat-bubble-anim { animation: chatPop 0.3s ease-out forwards; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased">
@@ -193,38 +199,58 @@
                 <img src="logo.png" onerror="this.src='https://via.placeholder.com/64/0071e3/ffffff?text=H'" alt="hadkart app icon" class="w-12 h-12 rounded-xl shadow-md object-cover" loading="lazy">
                 <div>
                     <h3 class="text-sm font-semibold text-[#1d1d1f] mb-1">Save hadkart to your Phone Home Screen</h3>
-                    <p class="text-xs text-slate-500">Access hadkart instantly like an app! In iPhone Safari, tap the <strong>Share</strong> button and select <strong>'Add to Home Screen'</strong>.</p>
+                    <p class="text-xs text-slate-500">Access hadkart instantly like an app! Tap below to open share/install options and choose <strong>'Add to Home Screen'</strong>.</p>
                 </div>
             </div>
             <button onclick="triggerInstallPrompt()" class="apple-btn px-5 py-2.5 text-xs font-medium shrink-0 shadow-sm">
-                <i class="fa-solid fa-bookmark mr-1.5"></i> Save to Home Screen
+                <i class="fa-solid fa-share-from-square mr-1.5"></i> Add to Home Screen
             </button>
         </div>
     </section>
 
-    <!-- WhatsApp Support Widget -->
+    <!-- Interactive Live WhatsApp Chat Widget -->
     <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-        <div id="whatsappPopupBox" class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 mb-3 w-64 text-right hidden transition-all duration-300">
-            <div class="flex justify-between items-center mb-2 border-b pb-1.5">
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Quick Assistance</span>
-                <button onclick="toggleWhatsappPopup()" class="text-slate-400 hover:text-slate-700 text-sm"><i class="fa-solid fa-xmark"></i></button>
+        <!-- Mini WhatsApp Chat Window -->
+        <div id="whatsappPopupBox" class="bg-[#efeae2] rounded-2xl shadow-2xl border border-slate-200 mb-3 w-80 sm:w-84 overflow-hidden hidden transition-all duration-300 flex flex-col">
+            <!-- Green WhatsApp Style Header -->
+            <div class="bg-[#075e54] text-white p-3.5 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="relative">
+                        <img src="logo.png" onerror="this.src='https://via.placeholder.com/40/25d366/ffffff?text=H'" class="w-9 h-9 rounded-full object-cover border border-white/30">
+                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#25d366] border-2 border-[#075e54] rounded-full"></span>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-semibold leading-tight">hadkart Design Team</h4>
+                        <span class="text-[10px] text-emerald-100 block">Online | Typically replies instantly</span>
+                    </div>
+                </div>
+                <button onclick="toggleWhatsappPopup()" class="text-white/80 hover:text-white text-base px-1"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p class="text-xs font-semibold text-[#1d1d1f] mb-3 text-left">Need a Plan or 3D Design, or have product doubts?</p>
-            <div class="space-y-2">
-                <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20need%20assistance%20with%20my%20architectural%20designs%20and%20orders." target="_blank" class="w-full bg-[#34c759] hover:bg-[#30b552] text-white py-2 px-3 rounded-xl text-xs font-medium flex items-center justify-center gap-2 shadow-sm transition">
-                    <i class="fa-brands fa-whatsapp text-sm"></i> Chat on WhatsApp
+
+            <!-- Chat Messages Container -->
+            <div id="waChatList" class="p-3.5 space-y-2.5 max-h-64 overflow-y-auto flex flex-col text-left">
+                <!-- Messages will be injected dynamically -->
+            </div>
+
+            <!-- Bottom Action Buttons -->
+            <div class="p-3 bg-white border-t border-slate-200 space-y-2">
+                <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20need%20assistance%20with%20my%20architectural%20designs%20and%20orders." target="_blank" class="w-full bg-[#25d366] hover:bg-[#20bd5a] text-white py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition">
+                    <i class="fa-brands fa-whatsapp text-base"></i> Reply on WhatsApp
                 </a>
                 <a href="tel:+917907383944" class="w-full bg-[#1d1d1f] hover:bg-black text-white py-2 px-3 rounded-xl text-xs font-medium flex items-center justify-center gap-2 shadow-sm transition">
-                    <i class="fa-solid fa-phone text-xs"></i> Call Directly
+                    <i class="fa-solid fa-phone text-xs"></i> Direct Call
                 </a>
             </div>
         </div>
-        <button onclick="toggleWhatsappPopup()" class="bg-[#34c759] hover:bg-[#30b552] text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl transition hover:scale-110" title="Open Support Menu">
+
+        <!-- Floating Button with Red Unread Badge -->
+        <button onclick="toggleWhatsappPopup()" class="relative bg-[#25d366] hover:bg-[#20bd5a] text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl transition hover:scale-105" title="Open Support Chat">
             <i class="fa-brands fa-whatsapp"></i>
+            <span id="waUnreadBadge" class="absolute -top-1 -right-1 bg-[#ff3b30] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md border-2 border-white hidden">0</span>
         </button>
     </div>
 
-    <!-- Exit Popup Modal -->
+    <!-- Exit / 1-Minute Popup Modal -->
     <div id="exitPopup" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 modal modal-hidden">
         <div class="bg-white max-w-sm w-full p-6 rounded-3xl shadow-2xl relative text-center border border-slate-100">
             <button onclick="closeExitPopup()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
@@ -247,6 +273,13 @@
                 <button onclick="closeCartModal()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="cartItemsList" class="flex-1 overflow-y-auto py-4 space-y-4 text-xs"></div>
+            
+            <!-- Recommended Upsell inside Cart -->
+            <div id="cartRecommendedSection" class="pt-3 border-t border-slate-100 hidden">
+                <h4 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">You Might Also Like</h4>
+                <div id="cartRecommendedList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
+            </div>
+
             <div class="border-t border-slate-100 pt-4 space-y-3">
                 <div class="flex gap-2">
                     <input type="text" id="couponInput" placeholder="Promo code" class="flex-1 px-3 py-1.5 bg-[#f5f5f7] border-0 rounded-xl text-xs uppercase focus:ring-1 focus:ring-[#0071e3]">
@@ -284,10 +317,20 @@
                     <label class="block font-medium text-slate-600 mb-1">Delivery Address (Required for Physical Items)</label>
                     <textarea id="checkoutAddress" rows="3" placeholder="House Name, Post, District, PIN Code" class="w-full px-3 py-2 bg-[#f5f5f7] border-0 rounded-xl focus:ring-1 focus:ring-[#0071e3]"></textarea>
                 </div>
+
+                <!-- Recommended Add-ons in Checkout -->
+                <div id="checkoutRecommendedSection" class="pt-3 border-t border-slate-100 hidden">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Recommended Add-ons</span>
+                        <span id="checkoutTotalBadge" class="text-xs font-bold text-[#0071e3]"></span>
+                    </div>
+                    <div id="checkoutRecommendedList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
+                </div>
+
                 <div class="flex items-center justify-center gap-4 py-2 bg-[#f5f5f7] rounded-xl text-[11px] text-slate-500 font-medium">
                     <span><i class="fa-solid fa-lock text-[#34c759] mr-1"></i> 100% Secure Payment</span>
                 </div>
-                <button type="submit" id="payButton" class="w-full apple-btn py-3.5 font-medium transition shadow-sm">Pay</button>
+                <button type="submit" id="payButton" class="w-full apple-btn py-3.5 font-medium transition shadow-sm">Pay Now</button>
                 <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20am%20facing%20issues%20with%20payment%20on%20checkout.%20Please%20help." target="_blank" class="w-full bg-[#34c759] hover:bg-[#30b552] text-white py-2.5 px-3 rounded-full font-medium text-xs flex items-center justify-center gap-2 shadow-sm transition">
                     <i class="fa-brands fa-whatsapp text-sm"></i> Having payment issue? Chat on WhatsApp
                 </a>
@@ -351,7 +394,7 @@
             </div>
         </div>
         <div class="text-center border-t border-slate-100 pt-6 text-[11px] text-slate-400">
-            &copy; 2026 hadkart. All rights reserved. Designed with Apple-grade aesthetics.
+            &copy; 2026 hadkart.com. All rights reserved. | Designed by Hamras Mohammed
         </div>
     </footer>
 
@@ -374,6 +417,113 @@
         let currentActiveProductId = null;
         let deferredPrompt = null;
         let bannerIntervals = [];
+
+        // WhatsApp Auto-Chat Variables
+        let waUnreadCount = 0;
+        let audioCtx = null;
+        const waAutoMessages = [
+            "ഹായ്! 👋 നിങ്ങൾ സ്വന്തമായി വീട് നിർമ്മിക്കാനോ റിനോവേറ്റ് ചെയ്യാനോ പ്ലാൻ ചെയ്യുന്നുണ്ടോ?",
+            "നിങ്ങളുടെ പ്ലോട്ടിന് അനുയോജ്യമായ 2D പ്ലാനുകൾ, 3D എലിവേഷൻ ഡിസൈനുകൾ എന്നിവ നോക്കുന്നുണ്ടോ?",
+            "വീട് പണിയിലെ ചെലവുകൾ കുറയ്ക്കാനും തെറ്റുകൾ ഒഴിവാക്കാനുമുള്ള ഞങ്ങളുടെ ഡിജിറ്റൽ ഗൈഡുകൾ നിങ്ങൾ ചെക്ക് ചെയ്തോ?",
+            "കൺസ്ട്രക്ഷൻ, ഇന്റീരിയർ ഡിസൈൻ എന്നിവയുമായി ബന്ധപ്പെട്ട് നേരിട്ട് സംസാരിക്കാൻ ആഗ്രഹമുണ്ടോ?",
+            "എന്ത് സംശയമുണ്ടെങ്കിലും മടിക്കേണ്ട, താഴെ കാണുന്ന ബട്ടണിൽ ക്ലിക്ക് ചെയ്ത് ഞങ്ങളുടെ ഡിസൈൻ ടീമുമായി നേരിട്ട് വാട്സാപ്പിൽ ചാറ്റ് ചെയ്യാം അല്ലെങ്കിൽ നേരിട്ട് വിളിക്കാം!"
+        ];
+
+        // Unlock Web Audio on first user interaction
+        function unlockAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+        document.addEventListener('click', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+        document.addEventListener('scroll', unlockAudio, { once: true });
+
+        function playNotificationSound() {
+            try {
+                if (!audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) audioCtx = new AudioContext();
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                if (!audioCtx) return;
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.12); // A5
+                
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+            } catch (e) {
+                // Ignore audio errors if blocked by browser autoplay policy
+            }
+        }
+
+        function initWhatsAppSequence() {
+            // 1st message at 10 seconds
+            setTimeout(() => { triggerWaMessage(0); }, 10000);
+            // 2nd message at 1 minute (60s)
+            setTimeout(() => { triggerWaMessage(1); }, 60000);
+            // 3rd message at 2 minutes (120s)
+            setTimeout(() => { triggerWaMessage(2); }, 120000);
+            // 4th message at 3 minutes (180s)
+            setTimeout(() => { triggerWaMessage(3); }, 180000);
+            // 5th message at 4 minutes (240s)
+            setTimeout(() => { triggerWaMessage(4); }, 240000);
+        }
+
+        function triggerWaMessage(index) {
+            if (index >= waAutoMessages.length) return;
+            const chatList = document.getElementById('waChatList');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = "bg-white p-2.5 rounded-2xl rounded-tl-none shadow-sm text-xs text-[#1d1d1f] max-w-[92%] self-start chat-bubble-anim relative border border-slate-100";
+            msgDiv.innerHTML = `
+                <p class="leading-relaxed">${waAutoMessages[index]}</p>
+                <span class="text-[9px] text-slate-400 block text-right mt-1">${timeStr}</span>
+            `;
+            chatList.appendChild(msgDiv);
+            chatList.scrollTop = chatList.scrollHeight;
+
+            const popupBox = document.getElementById('whatsappPopupBox');
+            if (popupBox.classList.contains('hidden')) {
+                waUnreadCount++;
+                const badge = document.getElementById('waUnreadBadge');
+                badge.textContent = waUnreadCount;
+                badge.classList.remove('hidden');
+            }
+            playNotificationSound();
+        }
+
+        function toggleWhatsappPopup() {
+            const box = document.getElementById('whatsappPopupBox');
+            const badge = document.getElementById('waUnreadBadge');
+            box.classList.toggle('hidden');
+
+            if (!box.classList.contains('hidden')) {
+                waUnreadCount = 0;
+                badge.classList.add('hidden');
+                const chatList = document.getElementById('waChatList');
+                if (chatList.children.length === 0) {
+                    triggerWaMessage(0);
+                }
+            }
+        }
 
         function parsePrice(val) {
             if (val === undefined || val === null) return 0;
@@ -414,6 +564,7 @@
             fetchStoreData();
             updateWishlistBadge();
             initExitIntentAndTimer();
+            initWhatsAppSequence();
             window.addEventListener('hashchange', checkUrlHash);
 
             window.addEventListener('beforeinstallprompt', (e) => {
@@ -682,16 +833,16 @@
                                 <h3 class="font-semibold text-[#1d1d1f] text-sm mt-1 line-clamp-1">${p['Product Name']}</h3>
                                 <p class="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">${descText}</p>
                             </div>
-                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                                <div>
-                                    ${regPrice > salePrice ? `<span class="text-[10px] text-slate-400 line-through">₹${regPrice.toLocaleString('en-IN')}</span>` : ''}
-                                    <div class="text-sm font-semibold text-[#1d1d1f]">₹${salePrice.toLocaleString('en-IN')}</div>
+                            <div class="mt-4 pt-3 border-t border-slate-100">
+                                <div class="flex items-baseline gap-2 mb-3">
+                                    <span class="text-base font-bold text-[#1d1d1f]">₹${salePrice.toLocaleString('en-IN')}</span>
+                                    ${regPrice > salePrice ? `<span class="text-[11px] text-slate-400 line-through">₹${regPrice.toLocaleString('en-IN')}</span>` : ''}
                                 </div>
-                                <div class="flex items-center gap-1.5">
-                                    <button onclick="event.stopPropagation(); addToCart('${prodId}')" class="bg-[#e8e8ed] hover:bg-[#d2d2d7] text-[#1d1d1f] px-2.5 py-1.5 rounded-full text-[11px] font-medium transition" title="Add to Bag">
-                                        <i class="fa-solid fa-cart-plus"></i>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="event.stopPropagation(); addToCart('${prodId}')" class="bg-[#e8e8ed] hover:bg-[#d2d2d7] text-[#1d1d1f] py-2 rounded-full text-[11px] font-semibold transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-bag-shopping text-[10px]"></i> Add to Bag
                                     </button>
-                                    <button onclick="event.stopPropagation(); buyNow('${prodId}')" class="apple-btn px-3 py-1.5 text-[11px] font-medium transition">
+                                    <button onclick="event.stopPropagation(); buyNow('${prodId}')" class="apple-btn py-2 text-[11px] font-semibold transition flex items-center justify-center">
                                         Buy Now
                                     </button>
                                 </div>
@@ -777,8 +928,10 @@
                     </div>
                     <div class="space-y-3">
                         <div class="grid grid-cols-2 gap-3">
-                            <button onclick="addToCart('${product['Product ID']}'); openCartModal();" class="bg-[#e8e8ed] hover:bg-[#d2d2d7] text-[#1d1d1f] py-3.5 text-xs font-medium rounded-full transition">Add to Bag</button>
-                            <button onclick="buyNow('${product['Product ID']}')" class="apple-btn py-3.5 text-xs font-medium shadow-md">Buy Now</button>
+                            <button onclick="addToCart('${product['Product ID']}'); openCartModal();" class="bg-[#e8e8ed] hover:bg-[#d2d2d7] text-[#1d1d1f] py-3.5 text-xs font-semibold rounded-full transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-bag-shopping"></i> Add to Bag
+                            </button>
+                            <button onclick="buyNow('${product['Product ID']}')" class="apple-btn py-3.5 text-xs font-semibold shadow-md">Buy Now</button>
                         </div>
                     </div>
                 </div>
@@ -878,7 +1031,10 @@
                         <img src="${getFirstImage(p)}" onclick="viewProductDetail('${p['Product ID']}')" class="w-full h-40 object-cover rounded-xl mb-3 cursor-pointer" loading="lazy">
                         <h3 class="font-semibold text-[#1d1d1f] text-xs line-clamp-1">${p['Product Name']}</h3>
                         <div class="text-xs font-semibold text-[#1d1d1f] mt-1">₹${salePrice.toLocaleString('en-IN')}</div>
-                        <button onclick="addToCart('${p['Product ID']}')" class="w-full mt-3 apple-btn py-1.5 text-[11px] font-medium">Add to Bag</button>
+                        <div class="grid grid-cols-2 gap-2 mt-3">
+                            <button onclick="addToCart('${p['Product ID']}')" class="bg-[#e8e8ed] hover:bg-[#d2d2d7] text-[#1d1d1f] py-1.5 rounded-full text-[11px] font-medium">Add to Bag</button>
+                            <button onclick="buyNow('${p['Product ID']}')" class="apple-btn py-1.5 text-[11px] font-medium">Buy Now</button>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -916,6 +1072,9 @@
                 cart.push({ ...product, qty: 1 });
             }
             updateCartUI();
+            if (!document.getElementById('checkoutModal').classList.contains('hidden')) {
+                updateCheckoutFieldsAndRecommends();
+            }
         }
 
         function buyNow(id) {
@@ -926,12 +1085,57 @@
             proceedToCheckout();
         }
 
+        function renderRecommendedInModals() {
+            const cartItemIds = cart.map(i => String(i['Product ID']));
+            const availableRecs = allProducts.filter(p => !cartItemIds.includes(String(p['Product ID']))).slice(0, 6);
+
+            const cartRecSec = document.getElementById('cartRecommendedSection');
+            const cartRecList = document.getElementById('cartRecommendedList');
+            const chkRecSec = document.getElementById('checkoutRecommendedSection');
+            const chkRecList = document.getElementById('checkoutRecommendedList');
+
+            if (!availableRecs.length) {
+                if (cartRecSec) cartRecSec.classList.add('hidden');
+                if (chkRecSec) chkRecSec.classList.add('hidden');
+                return;
+            }
+
+            const cardsHtml = availableRecs.map(p => {
+                const price = parsePrice(p['Sale Price']);
+                const pid = p['Product ID'];
+                return `
+                    <div class="min-w-[135px] max-w-[135px] bg-[#f5f5f7] p-2 rounded-xl flex flex-col justify-between shrink-0 border border-slate-200/60">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <img src="${getFirstImage(p)}" class="w-9 h-9 rounded-lg object-cover shrink-0">
+                            <div class="overflow-hidden">
+                                <h5 class="text-[10px] font-semibold text-[#1d1d1f] truncate">${p['Product Name']}</h5>
+                                <div class="text-[10px] font-bold text-[#0071e3]">₹${price.toLocaleString('en-IN')}</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="addToCart('${pid}')" class="w-full bg-white hover:bg-[#0071e3] hover:text-white text-[#1d1d1f] border border-slate-200 py-1 rounded-lg text-[10px] font-semibold transition">
+                            + Add
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            if (cartRecSec && cartRecList) {
+                cartRecSec.classList.remove('hidden');
+                cartRecList.innerHTML = cardsHtml;
+            }
+            if (chkRecSec && chkRecList) {
+                chkRecSec.classList.remove('hidden');
+                chkRecList.innerHTML = cardsHtml;
+            }
+        }
+
         function updateCartUI() {
             document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.qty, 0);
             const list = document.getElementById('cartItemsList');
             if (!cart.length) {
                 list.innerHTML = `<p class="text-center text-slate-400 py-8 text-xs">Your bag is empty.</p>`;
                 document.getElementById('cartTotalPrice').textContent = '₹0';
+                renderRecommendedInModals();
                 return;
             }
             list.innerHTML = cart.map(item => {
@@ -953,6 +1157,7 @@
             }).join('');
 
             calculateCartTotal();
+            renderRecommendedInModals();
         }
 
         function updateQty(id, delta) {
@@ -970,9 +1175,16 @@
             let subtotal = cart.reduce((sum, item) => sum + (parsePrice(item['Sale Price']) * item.qty), 0);
             let total = Math.max(0, subtotal - discountAmount);
             document.getElementById('cartTotalPrice').textContent = `₹${total.toLocaleString('en-IN')}`;
+            const chkBadge = document.getElementById('checkoutTotalBadge');
+            if (chkBadge) chkBadge.textContent = `Total: ₹${total.toLocaleString('en-IN')}`;
+            const payBtn = document.getElementById('payButton');
+            if (payBtn) payBtn.textContent = `Pay Now (₹${total.toLocaleString('en-IN')})`;
         }
 
-        function openCartModal() { document.getElementById('cartModal').classList.remove('hidden'); }
+        function openCartModal() {
+            renderRecommendedInModals();
+            document.getElementById('cartModal').classList.remove('hidden');
+        }
         function closeCartModal() { document.getElementById('cartModal').classList.add('hidden'); }
 
         async function applyCoupon() {
@@ -1003,10 +1215,7 @@
             }
         }
 
-        function proceedToCheckout() {
-            if (!cart.length) return;
-            closeCartModal();
-            
+        function updateCheckoutFieldsAndRecommends() {
             const hasPhysicalOrService = cart.some(item => {
                 const t = String(item['Product Type']).toLowerCase();
                 return t === 'physical' || t === 'service';
@@ -1025,12 +1234,17 @@
             } else {
                 nameContainer.classList.add('hidden');
                 nameInput.removeAttribute('required');
-                nameInput.value = '';
                 addressContainer.classList.add('hidden');
                 addressInput.removeAttribute('required');
-                addressInput.value = '';
             }
+            calculateCartTotal();
+            renderRecommendedInModals();
+        }
 
+        function proceedToCheckout() {
+            if (!cart.length) return;
+            closeCartModal();
+            updateCheckoutFieldsAndRecommends();
             document.getElementById('checkoutModal').classList.remove('hidden');
         }
 
@@ -1090,7 +1304,7 @@
                         itemIds: purchasedItemIds
                     });
                     btn.disabled = false;
-                    btn.textContent = "Pay";
+                    calculateCartTotal();
                 },
                 "prefill": {
                     "name": name,
@@ -1198,17 +1412,24 @@
 
         function logoutUser() { showSection('store'); }
 
-        function toggleWhatsappPopup() {
-            const box = document.getElementById('whatsappPopupBox');
-            box.classList.toggle('hidden');
-        }
-
-        function triggerInstallPrompt() {
+        async function triggerInstallPrompt() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+                return;
+            }
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'hadkart - Architectural Plans & Digital Store',
+                        text: 'Save hadkart to your Home Screen for quick access!',
+                        url: window.location.origin
+                    });
+                } catch (err) {
+                    console.log("Share closed");
+                }
             } else {
-                alert("To add hadkart to your Home Screen:\n\n• On iPhone/iPad (Safari): Tap the Share button below and select 'Add to Home Screen'.\n• On Android (Chrome): Tap the menu dots (⋮) and select 'Add to Home Screen' or 'Install app'.");
+                alert("To add hadkart to your Home Screen:\n\n• On iPhone/iPad (Safari): Tap the Share icon at the bottom and select 'Add to Home Screen'.\n• On Android (Chrome): Tap the menu dots (⋮) and select 'Add to Home Screen'.");
             }
         }
 
@@ -1226,12 +1447,13 @@
 
         function initExitIntentAndTimer() {
             let popupShown = false;
+            // 1 Minute (60,000 ms) timer
             setTimeout(() => {
                 if (!popupShown) {
                     document.getElementById('exitPopup').classList.remove('modal-hidden');
                     popupShown = true;
                 }
-            }, 45000);
+            }, 60000);
 
             document.addEventListener('mouseleave', e => {
                 if (e.clientY < 10 && !popupShown) {
