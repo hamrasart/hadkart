@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hadkart - Digital, Physical & Service Store</title>
+    <meta name="description" content="Browse digital architectural publications, 2D/3D home plans, construction guides, and expert design consultation services by hadkart.">
+    
+    <!-- Dynamic OpenGraph / Social Share Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" id="ogTitle" content="hadkart - Architectural Plans & Digital Store">
+    <meta property="og:description" id="ogDesc" content="Professional architectural designs, digital construction guides, and lifestyle products curated for modern living.">
+    <meta property="og:image" id="ogImage" content="https://hadkart.com/logo.png">
+    <meta property="og:url" id="ogUrl" content="https://hadkart.com">
+    <meta name="twitter:card" content="summary_large_image">
+
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
     <!-- Preconnect for Faster Loading -->
@@ -15,6 +25,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Razorpay Checkout Script -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Canvas Confetti for Order Success -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Meta Pixel & Google Analytics Integration Ready -->
+    <script>
+        const META_PIXEL_ID = ""; // നിങ്ങളുടെ Meta Pixel ID ഉണ്ടെങ്കിൽ ഇവിടെ നൽകാം
+        const GA_MEASUREMENT_ID = ""; // നിങ്ങളുടെ Google Analytics ID ഉണ്ടെങ്കിൽ ഇവിടെ നൽകാം
+
+        function trackStoreEvent(eventName, params = {}) {
+            try {
+                if (typeof fbq === 'function' && META_PIXEL_ID) fbq('track', eventName, params);
+                if (typeof gtag === 'function' && GA_MEASUREMENT_ID) gtag('event', eventName, params);
+            } catch (e) {}
+        }
+    </script>
+
     <style>
         body { background-color: #f5f5f7; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; overflow-x: hidden; }
         .modal { transition: opacity 0.3s ease, transform 0.3s ease; }
@@ -25,9 +51,14 @@
         .apple-btn { background-color: #0071e3; color: white; border-radius: 980px; transition: all 0.2s ease; }
         .apple-btn:hover { background-color: #0077ed; transform: scale(1.02); }
         
-        .banner-slide { animation: slideInRight 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .banner-slide { animation: slideInRight 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes slideInRight {
-            from { opacity: 0.3; transform: translateX(35px); }
+            from { opacity: 0.35; transform: translateX(25px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .banner-slide-prev { animation: slideInLeft 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideInLeft {
+            from { opacity: 0.35; transform: translateX(-25px); }
             to { opacity: 1; transform: translateX(0); }
         }
         
@@ -52,9 +83,10 @@
             50% { transform: scale(1.12); opacity: 1; filter: drop-shadow(0 8px 24px rgba(0, 113, 227, 0.35)); }
         }
         .logo-breathe { animation: breathe 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .touch-pan-y { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between antialiased">
+<body class="min-h-screen flex flex-col justify-between antialiased pb-16 md:pb-0">
 
     <!-- Initial Breathing Logo Loading Overlay -->
     <div id="pageLoader" class="fixed inset-0 z-[100] bg-[#f5f5f7] flex flex-col items-center justify-center transition-opacity duration-500">
@@ -69,7 +101,7 @@
         </div>
     </div>
 
-    <!-- Top Contact Banner (Scrolls away on mobile, stays sticky on desktop if needed or scrolls smoothly) -->
+    <!-- Top Contact Banner (Scrolls away on mobile) -->
     <div class="bg-[#1d1d1f] text-[#f5f5f7] text-xs py-2 px-4 text-center font-normal flex flex-col sm:flex-row items-center justify-center gap-2 md:sticky md:top-0 md:z-50">
         <span class="font-light">Looking for 3D plans, Home design or Construction works?</span>
         <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20discuss%20regarding%203D%20plans%20and%20construction%20works." target="_blank" class="bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium px-3.5 py-1 rounded-full text-[11px] inline-flex items-center gap-1.5 transition">
@@ -77,7 +109,7 @@
         </a>
     </div>
 
-    <!-- Sticky Main Navigation Bar (Always stays at top) -->
+    <!-- Sticky Main Navigation Bar -->
     <header class="sticky top-0 md:top-[36px] z-40 apple-glass border-b border-slate-200/60">
         <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between gap-4">
             <a href="#" onclick="showSection('store'); return false;" class="text-xl font-medium tracking-tight text-[#1d1d1f] flex items-center gap-2.5">
@@ -85,10 +117,11 @@
                 <span class="lowercase tracking-normal font-semibold text-lg">hadkart</span>
             </a>
 
-            <!-- Desktop Search Bar -->
+            <!-- Desktop Search Bar with Auto-Suggestions -->
             <div class="flex-1 max-w-sm relative hidden md:block">
-                <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search products, 3d plans, e-books..." class="w-full pl-9 pr-4 py-1.5 bg-[#e8e8ed] border-0 rounded-full text-xs text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50 transition">
+                <input type="text" id="searchInput" oninput="handleSearch(this.value, 'desktopSearchSuggestions')" onfocus="handleSearch(this.value, 'desktopSearchSuggestions')" placeholder="Search products, 3d plans, e-books..." autocomplete="off" class="w-full pl-9 pr-4 py-1.5 bg-[#e8e8ed] border-0 rounded-full text-xs text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50 transition">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                <div id="desktopSearchSuggestions" class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 hidden max-h-80 overflow-y-auto"></div>
             </div>
 
             <!-- Nav Actions -->
@@ -108,11 +141,12 @@
         </div>
     </header>
 
-    <!-- Mobile Search Bar (Outside sticky header so it scrolls away naturally on mobile) -->
-    <div class="p-3 bg-white border-b border-slate-200/60 md:hidden">
+    <!-- Mobile Search Bar with Auto-Suggestions (Scrolls away naturally on mobile) -->
+    <div class="p-3 bg-white border-b border-slate-200/60 md:hidden relative z-30">
         <div class="relative max-w-7xl mx-auto">
-            <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full pl-9 pr-4 py-2 bg-[#e8e8ed] border-0 rounded-full text-xs text-[#1d1d1f] focus:outline-none">
+            <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value, 'mobileSearchSuggestions')" onfocus="handleSearch(this.value, 'mobileSearchSuggestions')" placeholder="Search products..." autocomplete="off" class="w-full pl-9 pr-4 py-2 bg-[#e8e8ed] border-0 rounded-full text-xs text-[#1d1d1f] focus:outline-none">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+            <div id="mobileSearchSuggestions" class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 hidden max-h-72 overflow-y-auto"></div>
         </div>
     </div>
 
@@ -122,12 +156,12 @@
         <!-- STORE SECTION -->
         <div id="storeSection">
             
-            <!-- TOP BANNERS -->
+            <!-- TOP BANNERS (Touch Swipeable) -->
             <div id="topBannersWrapper" class="mb-10 space-y-4">
-                <div id="topMainBannerContainer">
+                <div id="topMainBannerContainer" class="touch-pan-y">
                     <div class="w-full h-48 md:h-72 rounded-2xl skeleton"></div>
                 </div>
-                <div id="topSlimBannerContainer">
+                <div id="topSlimBannerContainer" class="touch-pan-y">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="w-full h-28 md:h-40 rounded-2xl skeleton"></div>
                         <div class="w-full h-28 md:h-40 rounded-2xl skeleton"></div>
@@ -162,10 +196,10 @@
             <!-- Pagination Controls -->
             <div id="paginationContainer" class="flex justify-center items-center flex-wrap gap-2 mt-12"></div>
 
-            <!-- BOTTOM BANNERS -->
+            <!-- BOTTOM BANNERS (Touch Swipeable) -->
             <div id="bottomBannersWrapper" class="mt-14 space-y-4">
-                <div id="bottomMainBannerContainer"></div>
-                <div id="bottomSlimBannerContainer"></div>
+                <div id="bottomMainBannerContainer" class="touch-pan-y"></div>
+                <div id="bottomSlimBannerContainer" class="touch-pan-y"></div>
             </div>
         </div>
 
@@ -217,6 +251,22 @@
         </div>
     </main>
 
+    <!-- Sticky Mobile Bottom Buy Bar (Only visible on Mobile Product Detail Page) -->
+    <div id="mobileStickyBuyBar" class="fixed bottom-0 left-0 right-0 z-40 apple-glass border-t border-slate-200/80 p-3 px-4 md:hidden hidden flex items-center justify-between gap-3 shadow-2xl">
+        <div class="overflow-hidden">
+            <div id="stickyBarTitle" class="text-[11px] font-medium text-slate-500 truncate max-w-[130px]">Product</div>
+            <div id="stickyBarPrice" class="text-base font-bold text-[#1d1d1f]">₹0</div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+            <button id="stickyAddBagBtn" class="bg-[#e8e8ed] hover:bg-[#d2d2d7] text-[#1d1d1f] px-4 py-2.5 rounded-full text-xs font-semibold transition flex items-center gap-1.5">
+                <i class="fa-solid fa-bag-shopping text-[11px]"></i> Add to Bag
+            </button>
+            <button id="stickyBuyNowBtn" class="apple-btn px-5 py-2.5 text-xs font-semibold shadow-sm">
+                Buy Now
+            </button>
+        </div>
+    </div>
+
     <!-- Save to Phone Home Screen Widget -->
     <section class="max-w-7xl mx-auto px-6 my-8 w-full">
         <div class="apple-card p-6 bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
@@ -234,10 +284,9 @@
     </section>
 
     <!-- Interactive Live WhatsApp Chat Widget -->
-    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div id="floatingWaContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end transition-all duration-300">
         <!-- Mini WhatsApp Chat Window -->
         <div id="whatsappPopupBox" class="bg-[#efeae2] rounded-2xl shadow-2xl border border-slate-200 mb-3 w-80 sm:w-84 overflow-hidden hidden transition-all duration-300 flex flex-col">
-            <!-- Green WhatsApp Style Header -->
             <div class="bg-[#075e54] text-white p-3.5 flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                     <div class="relative">
@@ -252,12 +301,8 @@
                 <button onclick="toggleWhatsappPopup()" class="text-white/80 hover:text-white text-base px-1"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- Chat Messages Container -->
-            <div id="waChatList" class="p-3.5 space-y-2.5 max-h-64 overflow-y-auto flex flex-col text-left">
-                <!-- Messages will be injected dynamically -->
-            </div>
+            <div id="waChatList" class="p-3.5 space-y-2.5 max-h-64 overflow-y-auto flex flex-col text-left"></div>
 
-            <!-- Bottom Action Buttons -->
             <div class="p-3 bg-white border-t border-slate-200 space-y-2">
                 <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20need%20assistance%20with%20my%20architectural%20designs%20and%20orders." target="_blank" class="w-full bg-[#25d366] hover:bg-[#20bd5a] text-white py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition">
                     <i class="fa-brands fa-whatsapp text-base"></i> Reply on WhatsApp
@@ -268,7 +313,6 @@
             </div>
         </div>
 
-        <!-- Floating Button with Red Unread Badge -->
         <button onclick="toggleWhatsappPopup()" class="relative bg-[#25d366] hover:bg-[#20bd5a] text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl transition hover:scale-105" title="Open Support Chat">
             <i class="fa-brands fa-whatsapp"></i>
             <span id="waUnreadBadge" class="absolute -top-1 -right-1 bg-[#ff3b30] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md border-2 border-white hidden">0</span>
@@ -290,6 +334,19 @@
         </div>
     </div>
 
+    <!-- Order Success Celebration Modal -->
+    <div id="orderSuccessModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white max-w-sm w-full p-6 rounded-3xl shadow-2xl text-center border border-slate-100 relative">
+            <div class="w-16 h-16 bg-[#34c759]/15 text-[#34c759] rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 class="text-xl font-bold text-[#1d1d1f] mb-1">Order Confirmed! 🎉</h3>
+            <p class="text-xs text-slate-500 mb-4">Thank you for your purchase. We have sent your access links & login credentials to your email.</p>
+            <div id="orderSuccessDetails" class="bg-[#f5f5f7] p-3.5 rounded-2xl text-xs text-left space-y-1.5 mb-5 border border-slate-200/60"></div>
+            <button onclick="closeOrderSuccessModal()" class="w-full apple-btn py-3 text-xs font-semibold shadow-md">Continue Shopping</button>
+        </div>
+    </div>
+
     <!-- CART SIDEBAR MODAL -->
     <div id="cartModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden flex justify-end">
         <div class="bg-white w-full max-w-md h-full p-6 flex flex-col shadow-2xl">
@@ -305,13 +362,22 @@
                 <div id="cartRecommendedList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
             </div>
 
-            <div class="border-t border-slate-100 pt-4 space-y-3">
+            <div class="border-t border-slate-100 pt-3 space-y-2.5">
                 <div class="flex gap-2">
                     <input type="text" id="couponInput" placeholder="Promo code" class="flex-1 px-3 py-1.5 bg-[#f5f5f7] border-0 rounded-xl text-xs uppercase focus:ring-1 focus:ring-[#0071e3]">
-                    <button onclick="applyCoupon()" class="bg-[#1d1d1f] text-white px-3 py-1.5 rounded-xl text-xs font-medium">Apply</button>
+                    <button onclick="applyCoupon()" class="bg-[#1d1d1f] text-white px-3.5 py-1.5 rounded-xl text-xs font-medium">Apply</button>
                 </div>
                 <div id="couponMessage" class="text-[11px]"></div>
-                <div class="flex justify-between text-sm font-semibold text-[#1d1d1f]">
+
+                <!-- Swipeable Available Coupons Section -->
+                <div id="availableCouponsWrapper" class="pt-1 hidden">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-ticket text-[#0071e3] mr-1"></i>Available Offers (Swipe)</span>
+                    </div>
+                    <div id="availableCouponsList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1"></div>
+                </div>
+
+                <div class="flex justify-between text-sm font-semibold text-[#1d1d1f] pt-1">
                     <span>Total:</span>
                     <span id="cartTotalPrice">₹0</span>
                 </div>
@@ -322,7 +388,7 @@
 
     <!-- CHECKOUT MODAL -->
     <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white max-w-md w-full p-6 rounded-3xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div class="bg-white max-w-md w-full p-6 rounded-3xl shadow-2xl relative max-h-[92vh] overflow-y-auto">
             <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
             <h2 class="text-lg font-semibold text-[#1d1d1f] mb-4">Checkout Details</h2>
             <form id="checkoutForm" onsubmit="handleRazorpayPayment(event)" class="space-y-4 text-xs">
@@ -352,9 +418,20 @@
                     <div id="checkoutRecommendedList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
                 </div>
 
-                <div class="flex items-center justify-center gap-4 py-2 bg-[#f5f5f7] rounded-xl text-[11px] text-slate-500 font-medium">
-                    <span><i class="fa-solid fa-lock text-[#34c759] mr-1"></i> 100% Secure Payment</span>
+                <!-- Verified Payment & Security Badges -->
+                <div class="bg-[#f5f5f7] p-3 rounded-2xl border border-slate-200/60 space-y-2">
+                    <div class="flex items-center justify-center gap-2 text-[11px] text-[#1d1d1f] font-semibold">
+                        <i class="fa-solid fa-shield-halved text-[#34c759] text-sm"></i>
+                        <span>100% Safe & Verified Razorpay Checkout</span>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-center gap-2 text-[10px] text-slate-500 font-medium">
+                        <span class="bg-white px-2.5 py-1 rounded-md border border-slate-200/80 shadow-2xs flex items-center gap-1"><i class="fa-solid fa-mobile-screen-button text-[#0071e3]"></i> UPI</span>
+                        <span class="bg-white px-2.5 py-1 rounded-md border border-slate-200/80 shadow-2xs flex items-center gap-1"><i class="fa-brands fa-google-pay text-slate-700 text-xs"></i> GPay</span>
+                        <span class="bg-white px-2.5 py-1 rounded-md border border-slate-200/80 shadow-2xs">PhonePe</span>
+                        <span class="bg-white px-2.5 py-1 rounded-md border border-slate-200/80 shadow-2xs flex items-center gap-1"><i class="fa-regular fa-credit-card text-slate-700"></i> Cards</span>
+                    </div>
                 </div>
+
                 <button type="submit" id="payButton" class="w-full apple-btn py-3.5 font-medium transition shadow-sm">Pay Now</button>
                 <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20am%20facing%20issues%20with%20payment%20on%20checkout.%20Please%20help." target="_blank" class="w-full bg-[#34c759] hover:bg-[#30b552] text-white py-2.5 px-3 rounded-full font-medium text-xs flex items-center justify-center gap-2 shadow-sm transition">
                     <i class="fa-brands fa-whatsapp text-sm"></i> Having payment issue? Chat on WhatsApp
@@ -428,9 +505,20 @@
         const RAZORPAY_LIVE_KEY = "rzp_live_3crrlxJYnfWJo9"; 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0fYOZ4JS-7ISvajLHiNxi4kvdqDB298NKfWisB6zYQ0a-8waQkg5DDsoOfFgzostHmw/exec";
         
+        // Default Coupons from Google Sheet Screenshot (Automatically replaced if API returns live coupons array)
+        const DEFAULT_SHEET_COUPONS = [
+            { 'Coupon Code': 'WELCOME20', 'Discount Type': 'Fixed', 'Discount Value': 20, 'Minimum Order Amount': 100, 'Status': 'Active' },
+            { 'Coupon Code': 'WELCOME15', 'Discount Type': 'Percentage', 'Discount Value': 100, 'Minimum Order Amount': 499, 'Status': 'Active' },
+            { 'Coupon Code': 'OFFER10', 'Discount Type': 'Percentage', 'Discount Value': 10, 'Minimum Order Amount': 10, 'Status': 'Active' },
+            { 'Coupon Code': 'OFFER15', 'Discount Type': 'Percentage', 'Discount Value': 15, 'Minimum Order Amount': 999, 'Status': 'Active' },
+            { 'Coupon Code': 'OFFER20', 'Discount Type': 'Percentage', 'Discount Value': 20, 'Minimum Order Amount': 1999, 'Status': 'Active' },
+            { 'Coupon Code': 'OFFER25', 'Discount Type': 'Percentage', 'Discount Value': 25, 'Minimum Order Amount': 2999, 'Status': 'Active' }
+        ];
+
         let allProducts = [];
         let allBanners = [];
-        let cart = [];
+        let allCoupons = [...DEFAULT_SHEET_COUPONS];
+        let cart = JSON.parse(localStorage.getItem('hadkart_cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('hadkart_wishlist')) || [];
         let recentlyViewed = JSON.parse(localStorage.getItem('hadkart_recent')) || [];
         let currentSort = "default";
@@ -443,7 +531,10 @@
         let deferredPrompt = null;
         let bannerIntervals = [];
 
-        // Hide Initial Page Loader Smoothly
+        function saveCartToStorage() {
+            localStorage.setItem('hadkart_cart', JSON.stringify(cart));
+        }
+
         function hidePageLoader() {
             const loader = document.getElementById('pageLoader');
             if (loader && !loader.classList.contains('opacity-0')) {
@@ -451,6 +542,18 @@
                 setTimeout(() => { loader.style.display = 'none'; }, 500);
             }
         }
+
+        // Close search suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            const deskBox = document.getElementById('desktopSearchSuggestions');
+            const mobBox = document.getElementById('mobileSearchSuggestions');
+            if (deskBox && !e.target.closest('#searchInput') && !e.target.closest('#desktopSearchSuggestions')) {
+                deskBox.classList.add('hidden');
+            }
+            if (mobBox && !e.target.closest('#mobileSearchInput') && !e.target.closest('#mobileSearchSuggestions')) {
+                mobBox.classList.add('hidden');
+            }
+        });
 
         // WhatsApp Auto-Chat Variables
         let waUnreadCount = 0;
@@ -463,7 +566,6 @@
             "എന്ത് സംശയമുണ്ടെങ്കിലും മടിക്കേണ്ട, താഴെ കാണുന്ന ബട്ടണിൽ ക്ലിക്ക് ചെയ്ത് ഞങ്ങളുടെ ഡിസൈൻ ടീമുമായി നേരിട്ട് വാട്സാപ്പിൽ ചാറ്റ് ചെയ്യാം അല്ലെങ്കിൽ നേരിട്ട് വിളിക്കാം!"
         ];
 
-        // Unlock Web Audio on first user interaction
         function unlockAudio() {
             if (!audioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -491,8 +593,8 @@
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.12); // A5
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.12);
                 
                 gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
@@ -501,9 +603,7 @@
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.35);
-            } catch (e) {
-                // Ignore audio errors if blocked by browser autoplay policy
-            }
+            } catch (e) {}
         }
 
         function initWhatsAppSequence() {
@@ -588,7 +688,20 @@
             return b['Redirect URL'] || b['Link URL'] || b['Link'] || b['URL'] || b['Target URL'] || '';
         }
 
+        function updateDynamicMetaTags(title, desc, image) {
+            document.title = title;
+            const ogTitle = document.getElementById('ogTitle');
+            const ogDesc = document.getElementById('ogDesc');
+            const ogImage = document.getElementById('ogImage');
+            const ogUrl = document.getElementById('ogUrl');
+            if (ogTitle) ogTitle.setAttribute('content', title);
+            if (ogDesc) ogDesc.setAttribute('content', desc);
+            if (ogImage) ogImage.setAttribute('content', image);
+            if (ogUrl) ogUrl.setAttribute('content', window.location.href);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
+            updateCartUI();
             loadCachedStoreData();
             fetchStoreData();
             updateWishlistBadge();
@@ -596,7 +709,6 @@
             initWhatsAppSequence();
             window.addEventListener('hashchange', checkUrlHash);
 
-            // Safety fallback: hide loader after 3.5 seconds even if network is very slow
             setTimeout(hidePageLoader, 3500);
 
             window.addEventListener('beforeinstallprompt', (e) => {
@@ -607,14 +719,18 @@
 
         function loadCachedStoreData() {
             try {
-                const cached = localStorage.getItem('hadkart_store_cache_v2');
+                const cached = localStorage.getItem('hadkart_store_cache_v3');
                 if (cached) {
                     const parsed = JSON.parse(cached);
                     if (parsed.products && parsed.products.length) {
                         allProducts = parsed.products;
                         allBanners = parsed.banners || [];
+                        if (parsed.coupons && parsed.coupons.length) {
+                            allCoupons = parsed.coupons;
+                        }
                         renderProducts();
                         renderBanners();
+                        updateCartUI();
                         checkUrlHash();
                         setTimeout(hidePageLoader, 450);
                     }
@@ -631,14 +747,19 @@
                 if (data.status === "success") {
                     allProducts = (data.products || []).filter(p => p['Product ID'] || p['Product Name']);
                     allBanners = data.banners || [];
+                    if (Array.isArray(data.coupons)) {
+                        allCoupons = data.coupons;
+                    }
                     
-                    localStorage.setItem('hadkart_store_cache_v2', JSON.stringify({
+                    localStorage.setItem('hadkart_store_cache_v3', JSON.stringify({
                         products: allProducts,
-                        banners: allBanners
+                        banners: allBanners,
+                        coupons: allCoupons
                     }));
 
                     renderBanners();
                     renderProducts();
+                    updateCartUI();
                     checkUrlHash();
                     hidePageLoader();
                 }
@@ -646,6 +767,53 @@
                 console.error("Error loading store data:", err);
                 hidePageLoader();
             }
+        }
+
+        // Touch & Mouse Swipe Helper for Banner Containers
+        function attachSwipeGesture(el, itemCount, onSwipeDirection) {
+            el._swipeCallback = onSwipeDirection;
+            el._swipeEnabled = itemCount > 1;
+
+            if (el.dataset.swipeBound) return;
+            el.dataset.swipeBound = "true";
+
+            let startX = 0;
+            let startY = 0;
+            let isDown = false;
+
+            el.addEventListener('touchstart', (e) => {
+                if (!el._swipeEnabled) return;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }, { passive: true });
+
+            el.addEventListener('touchend', (e) => {
+                if (!el._swipeEnabled || !startX) return;
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                const diffX = startX - endX;
+                const diffY = Math.abs(startY - endY);
+
+                if (Math.abs(diffX) > 40 && Math.abs(diffX) > diffY) {
+                    el._swipeCallback(diffX > 0 ? 1 : -1);
+                }
+                startX = 0;
+            }, { passive: true });
+
+            el.addEventListener('mousedown', (e) => {
+                if (!el._swipeEnabled) return;
+                isDown = true;
+                startX = e.clientX;
+            });
+
+            el.addEventListener('mouseup', (e) => {
+                if (!el._swipeEnabled || !isDown) return;
+                isDown = false;
+                const diffX = startX - e.clientX;
+                if (Math.abs(diffX) > 45) {
+                    el._swipeCallback(diffX > 0 ? 1 : -1);
+                }
+            });
         }
 
         function renderBanners() {
@@ -715,7 +883,7 @@
                 }
             }
 
-            function buildSingleBannerCard(b, heightClass) {
+            function buildSingleBannerCard(b, heightClass, animClass = 'banner-slide') {
                 if (!b) return '';
                 const img = b['Image URL'] || b['Image URLs'] || '';
                 const title = b['Banner Title'] || b['Title'] || 'Featured Banner';
@@ -723,80 +891,133 @@
                 
                 if (link && link !== '#') {
                     return `
-                        <a href="${link}" target="_blank" rel="noopener noreferrer" class="block w-full rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/60 banner-slide cursor-pointer hover:opacity-95 transition">
-                            <img src="${img}" alt="${title}" class="w-full ${heightClass} object-cover">
+                        <a href="${link}" target="_blank" rel="noopener noreferrer" draggable="false" class="block w-full rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/60 ${animClass} cursor-pointer hover:opacity-95 transition">
+                            <img src="${img}" alt="${title}" draggable="false" class="w-full ${heightClass} object-cover pointer-events-none">
                         </a>
                     `;
                 }
                 return `
-                    <div class="w-full rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/60 banner-slide">
-                        <img src="${img}" alt="${title}" class="w-full ${heightClass} object-cover">
+                    <div class="w-full rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/60 ${animClass}">
+                        <img src="${img}" alt="${title}" draggable="false" class="w-full ${heightClass} object-cover pointer-events-none">
                     </div>
                 `;
             }
 
+            // 1. Top Main Banner
             let topMainIdx = 0;
-            function renderTopMain() {
+            function renderTopMain(dir = 1) {
                 if (!topMain.length) { topMainEl.innerHTML = ''; return; }
-                const current = topMain[topMainIdx % topMain.length];
-                topMainEl.innerHTML = buildSingleBannerCard(current, 'h-48 md:h-72');
+                const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
+                const current = topMain[((topMainIdx % topMain.length) + topMain.length) % topMain.length];
+                topMainEl.innerHTML = buildSingleBannerCard(current, 'h-48 md:h-72', anim);
             }
             renderTopMain();
             if (topMain.length > 1) {
-                bannerIntervals.push(setInterval(() => { topMainIdx++; renderTopMain(); }, 3500));
+                let tmTimer = setInterval(() => { topMainIdx++; renderTopMain(1); }, 3800);
+                bannerIntervals.push(tmTimer);
+                attachSwipeGesture(topMainEl, topMain.length, (dir) => {
+                    clearInterval(tmTimer);
+                    topMainIdx += dir;
+                    renderTopMain(dir);
+                    tmTimer = setInterval(() => { topMainIdx++; renderTopMain(1); }, 3800);
+                    bannerIntervals.push(tmTimer);
+                });
             }
 
+            // 2. Top Slim Banners
             let topSlimIdx = 0;
-            function renderTopSlim() {
+            function renderTopSlim(dir = 1) {
                 if (!topSlim.length) { topSlimEl.innerHTML = ''; return; }
+                const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 if (topSlim.length === 1) {
-                    topSlimEl.innerHTML = buildSingleBannerCard(topSlim[0], 'h-28 md:h-40');
+                    topSlimEl.innerHTML = buildSingleBannerCard(topSlim[0], 'h-28 md:h-40', anim);
                     return;
                 }
-                const leftB = topSlim[topSlimIdx % topSlim.length];
-                const rightB = topSlim[(topSlimIdx + 1) % topSlim.length];
+                const len = topSlim.length;
+                const leftB = topSlim[((topSlimIdx % len) + len) % len];
+                const rightB = topSlim[(((topSlimIdx + 1) % len) + len) % len];
                 topSlimEl.innerHTML = `
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${buildSingleBannerCard(leftB, 'h-28 md:h-40')}
-                        ${buildSingleBannerCard(rightB, 'h-28 md:h-40')}
+                        ${buildSingleBannerCard(leftB, 'h-28 md:h-40', anim)}
+                        ${buildSingleBannerCard(rightB, 'h-28 md:h-40', anim)}
                     </div>
                 `;
             }
             renderTopSlim();
-            if (topSlim.length > 2) {
-                bannerIntervals.push(setInterval(() => { topSlimIdx += 2; renderTopSlim(); }, 4500));
+            if (topSlim.length > 1) {
+                let tsTimer = null;
+                if (topSlim.length > 2) {
+                    tsTimer = setInterval(() => { topSlimIdx += 2; renderTopSlim(1); }, 4500);
+                    bannerIntervals.push(tsTimer);
+                }
+                attachSwipeGesture(topSlimEl, topSlim.length, (dir) => {
+                    if (tsTimer) clearInterval(tsTimer);
+                    topSlimIdx += dir;
+                    renderTopSlim(dir);
+                    if (topSlim.length > 2) {
+                        tsTimer = setInterval(() => { topSlimIdx += 2; renderTopSlim(1); }, 4500);
+                        bannerIntervals.push(tsTimer);
+                    }
+                });
             }
 
+            // 3. Bottom Main Banner
             let bottomMainIdx = 0;
-            function renderBottomMain() {
+            function renderBottomMain(dir = 1) {
                 if (!bottomMain.length) { bottomMainEl.innerHTML = ''; return; }
-                const current = bottomMain[bottomMainIdx % bottomMain.length];
-                bottomMainEl.innerHTML = buildSingleBannerCard(current, 'h-44 md:h-64');
+                const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
+                const len = bottomMain.length;
+                const current = bottomMain[((bottomMainIdx % len) + len) % len];
+                bottomMainEl.innerHTML = buildSingleBannerCard(current, 'h-44 md:h-64', anim);
             }
             renderBottomMain();
             if (bottomMain.length > 1) {
-                bannerIntervals.push(setInterval(() => { bottomMainIdx++; renderBottomMain(); }, 4000));
+                let bmTimer = setInterval(() => { bottomMainIdx++; renderBottomMain(1); }, 4200);
+                bannerIntervals.push(bmTimer);
+                attachSwipeGesture(bottomMainEl, bottomMain.length, (dir) => {
+                    clearInterval(bmTimer);
+                    bottomMainIdx += dir;
+                    renderBottomMain(dir);
+                    bmTimer = setInterval(() => { bottomMainIdx++; renderBottomMain(1); }, 4200);
+                    bannerIntervals.push(bmTimer);
+                });
             }
 
+            // 4. Bottom Slim Banners
             let bottomSlimIdx = 0;
-            function renderBottomSlim() {
+            function renderBottomSlim(dir = 1) {
                 if (!bottomSlim.length) { bottomSlimEl.innerHTML = ''; return; }
+                const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 if (bottomSlim.length === 1) {
-                    bottomSlimEl.innerHTML = buildSingleBannerCard(bottomSlim[0], 'h-28 md:h-40');
+                    bottomSlimEl.innerHTML = buildSingleBannerCard(bottomSlim[0], 'h-28 md:h-40', anim);
                     return;
                 }
-                const leftB = bottomSlim[bottomSlimIdx % bottomSlim.length];
-                const rightB = bottomSlim[(bottomSlimIdx + 1) % bottomSlim.length];
+                const len = bottomSlim.length;
+                const leftB = bottomSlim[((bottomSlimIdx % len) + len) % len];
+                const rightB = bottomSlim[(((bottomSlimIdx + 1) % len) + len) % len];
                 bottomSlimEl.innerHTML = `
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${buildSingleBannerCard(leftB, 'h-28 md:h-40')}
-                        ${buildSingleBannerCard(rightB, 'h-28 md:h-40')}
+                        ${buildSingleBannerCard(leftB, 'h-28 md:h-40', anim)}
+                        ${buildSingleBannerCard(rightB, 'h-28 md:h-40', anim)}
                     </div>
                 `;
             }
             renderBottomSlim();
-            if (bottomSlim.length > 2) {
-                bannerIntervals.push(setInterval(() => { bottomSlimIdx += 2; renderBottomSlim(); }, 4500));
+            if (bottomSlim.length > 1) {
+                let bsTimer = null;
+                if (bottomSlim.length > 2) {
+                    bsTimer = setInterval(() => { bottomSlimIdx += 2; renderBottomSlim(1); }, 4500);
+                    bannerIntervals.push(bsTimer);
+                }
+                attachSwipeGesture(bottomSlimEl, bottomSlim.length, (dir) => {
+                    if (bsTimer) clearInterval(bsTimer);
+                    bottomSlimIdx += dir;
+                    renderBottomSlim(dir);
+                    if (bottomSlim.length > 2) {
+                        bsTimer = setInterval(() => { bottomSlimIdx += 2; renderBottomSlim(1); }, 4500);
+                        bannerIntervals.push(bsTimer);
+                    }
+                });
             }
         }
 
@@ -806,10 +1027,57 @@
             renderProducts();
         }
 
-        function handleSearch(val) {
+        function handleSearch(val, suggestionBoxId) {
             searchQuery = String(val || '').toLowerCase().trim();
             currentPage = 1;
             renderProducts();
+            renderSearchSuggestions(searchQuery, suggestionBoxId);
+        }
+
+        function renderSearchSuggestions(query, boxId) {
+            const box = document.getElementById(boxId);
+            if (!box) return;
+            if (!query || query.length < 1) {
+                box.classList.add('hidden');
+                return;
+            }
+
+            const matches = allProducts.filter(p => {
+                const name = String(p['Product Name'] || '').toLowerCase();
+                const cat = String(p['Category'] || '').toLowerCase();
+                const tags = String(p['Tags'] || '').toLowerCase();
+                return name.includes(query) || cat.includes(query) || tags.includes(query);
+            }).slice(0, 5);
+
+            if (!matches.length) {
+                box.innerHTML = `<div class="p-3 text-center text-[11px] text-slate-400">No matching products found</div>`;
+                box.classList.remove('hidden');
+                return;
+            }
+
+            box.innerHTML = matches.map(p => {
+                const price = parsePrice(p['Sale Price']);
+                const pid = p['Product ID'];
+                return `
+                    <div onclick="selectSearchSuggestion('${pid}', '${boxId}')" class="flex items-center justify-between gap-3 p-2.5 hover:bg-[#f5f5f7] cursor-pointer border-b border-slate-100 last:border-0 transition">
+                        <div class="flex items-center gap-2.5 overflow-hidden">
+                            <img src="${getFirstImage(p)}" class="w-9 h-9 rounded-lg object-cover shrink-0">
+                            <div class="overflow-hidden">
+                                <div class="text-xs font-semibold text-[#1d1d1f] truncate">${p['Product Name']}</div>
+                                <div class="text-[10px] text-slate-400 truncate">${p['Product Type'] || 'Product'}</div>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-[#0071e3] shrink-0">₹${price.toLocaleString('en-IN')}</span>
+                    </div>
+                `;
+            }).join('');
+            box.classList.remove('hidden');
+        }
+
+        function selectSearchSuggestion(prodId, boxId) {
+            const box = document.getElementById(boxId);
+            if (box) box.classList.add('hidden');
+            viewProductDetail(prodId);
         }
 
         function renderProducts() {
@@ -926,6 +1194,17 @@
                 window.location.hash = `product=${id}`;
             }
 
+            const badgeText = getBadgeText(product);
+            const badgeColor = getBadgeColorClass(product);
+            const salePrice = parsePrice(product['Sale Price']);
+            const regPrice = parsePrice(product['Regular Price']);
+            const imgUrl = getFirstImage(product);
+            const descText = getDesc(product) || 'No description available.';
+
+            // Update Dynamic OpenGraph Tags & Pixel Tracking
+            updateDynamicMetaTags(`${product['Product Name']} - hadkart`, descText.slice(0, 150), imgUrl);
+            trackStoreEvent('ViewContent', { content_ids: [id], content_name: product['Product Name'], value: salePrice, currency: 'INR' });
+
             recentlyViewed = recentlyViewed.filter(item => String(item['Product ID']) !== String(id));
             recentlyViewed.unshift(product);
             if (recentlyViewed.length > 10) recentlyViewed.pop();
@@ -936,12 +1215,17 @@
             document.getElementById('legalSection').classList.add('hidden');
             document.getElementById('productDetailSection').classList.remove('hidden');
 
-            const badgeText = getBadgeText(product);
-            const badgeColor = getBadgeColorClass(product);
-            const salePrice = parsePrice(product['Sale Price']);
-            const regPrice = parsePrice(product['Regular Price']);
-            const imgUrl = getFirstImage(product);
-            const descText = getDesc(product) || 'No description available.';
+            // Configure Mobile Sticky Bottom Buy Bar
+            const stickyBar = document.getElementById('mobileStickyBuyBar');
+            const waFloat = document.getElementById('floatingWaContainer');
+            if (stickyBar) {
+                document.getElementById('stickyBarTitle').textContent = product['Product Name'];
+                document.getElementById('stickyBarPrice').textContent = `₹${salePrice.toLocaleString('en-IN')}`;
+                document.getElementById('stickyAddBagBtn').onclick = () => { addToCart(product['Product ID']); openCartModal(); };
+                document.getElementById('stickyBuyNowBtn').onclick = () => { buyNow(product['Product ID']); };
+                stickyBar.classList.remove('hidden');
+                if (waFloat) waFloat.classList.replace('bottom-6', 'bottom-20');
+            }
 
             document.getElementById('productDetailContent').innerHTML = `
                 <div class="bg-[#f5f5f7] rounded-2xl overflow-hidden flex items-center justify-center p-4 relative">
@@ -1089,9 +1373,15 @@
             document.getElementById('accountSection').classList.add('hidden');
             document.getElementById('legalSection').classList.add('hidden');
 
+            const stickyBar = document.getElementById('mobileStickyBuyBar');
+            const waFloat = document.getElementById('floatingWaContainer');
+            if (stickyBar) stickyBar.classList.add('hidden');
+            if (waFloat) waFloat.classList.replace('bottom-20', 'bottom-6');
+
             if (sec === 'store') {
                 document.getElementById('storeSection').classList.remove('hidden');
                 if (updateHash) window.location.hash = 'store';
+                updateDynamicMetaTags("hadkart - Digital, Physical & Service Store", "Professional architectural designs, digital guides, and lifestyle products.", "https://hadkart.com/logo.png");
                 renderProducts();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1106,7 +1396,9 @@
             } else {
                 cart.push({ ...product, qty: 1 });
             }
+            saveCartToStorage();
             updateCartUI();
+            trackStoreEvent('AddToCart', { content_ids: [id], content_name: product['Product Name'], value: parsePrice(product['Sale Price']), currency: 'INR' });
             if (!document.getElementById('checkoutModal').classList.contains('hidden')) {
                 updateCheckoutFieldsAndRecommends();
             }
@@ -1116,8 +1408,87 @@
             const product = allProducts.find(p => String(p['Product ID']) === String(id));
             if (!product) return;
             cart = [{ ...product, qty: 1 }];
+            saveCartToStorage();
             updateCartUI();
             proceedToCheckout();
+        }
+
+        // Render Swipeable Active Coupons inside Cart
+        function renderAvailableCoupons() {
+            const wrapper = document.getElementById('availableCouponsWrapper');
+            const listEl = document.getElementById('availableCouponsList');
+            if (!wrapper || !listEl) return;
+
+            const subtotal = cart.reduce((sum, item) => sum + (parsePrice(item['Sale Price']) * item.qty), 0);
+
+            // Filter strictly where Status is 'Active'
+            const activeCoupons = (allCoupons || []).filter(c => {
+                const status = String(c['Status'] || c['status'] || '').trim().toLowerCase();
+                const code = String(c['Coupon Code'] || c['code'] || '').trim();
+                return status === 'active' && code !== '';
+            });
+
+            if (!activeCoupons.length || subtotal <= 0) {
+                wrapper.classList.add('hidden');
+                return;
+            }
+
+            wrapper.classList.remove('hidden');
+
+            listEl.innerHTML = activeCoupons.map(c => {
+                const code = String(c['Coupon Code'] || c['code']).trim().toUpperCase();
+                const type = String(c['Discount Type'] || c['type'] || '').trim().toLowerCase();
+                const val = parsePrice(c['Discount Value'] || c['value']);
+                const minOrder = parsePrice(c['Minimum Order Amount'] || c['minOrder']);
+                
+                const isEligible = subtotal >= minOrder;
+                const isApplied = appliedCouponCode.toUpperCase() === code && discountAmount > 0;
+                const neededMore = Math.max(0, minOrder - subtotal);
+
+                const offerTitle = type.includes('percent') ? `${val}% OFF` : `₹${val} OFF`;
+
+                if (isEligible) {
+                    return `
+                        <div onclick="selectAndApplyCoupon('${code}')" class="min-w-[155px] max-w-[155px] p-2.5 rounded-xl border ${isApplied ? 'border-[#34c759] bg-emerald-50/60' : 'border-[#0071e3]/40 bg-blue-50/40 hover:bg-blue-50'} flex flex-col justify-between shrink-0 cursor-pointer transition">
+                            <div>
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#0071e3] text-white tracking-wider">${code}</span>
+                                    <span class="text-[11px] font-bold text-[#1d1d1f]">${offerTitle}</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-1.5">Orders above ₹${minOrder.toLocaleString('en-IN')}</p>
+                            </div>
+                            <div class="mt-2 pt-1.5 border-t border-slate-200/60 text-center">
+                                <span class="text-[10px] font-semibold ${isApplied ? 'text-[#34c759]' : 'text-[#0071e3]'}">
+                                    ${isApplied ? '<i class="fa-solid fa-check mr-1"></i>Applied' : 'Tap to Apply'}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="min-w-[155px] max-w-[155px] p-2.5 rounded-xl border border-slate-200 bg-[#f5f5f7] opacity-65 flex flex-col justify-between shrink-0 cursor-not-allowed select-none">
+                            <div>
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-300 text-slate-600 tracking-wider">${code}</span>
+                                    <span class="text-[11px] font-bold text-slate-600">${offerTitle}</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1.5">Min. Order ₹${minOrder.toLocaleString('en-IN')}</p>
+                            </div>
+                            <div class="mt-2 pt-1.5 border-t border-slate-200/60 text-center">
+                                <span class="text-[9px] font-medium text-[#ff9500]"><i class="fa-solid fa-lock mr-1"></i>Add ₹${neededMore.toLocaleString('en-IN')} more</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        function selectAndApplyCoupon(code) {
+            const input = document.getElementById('couponInput');
+            if (input) {
+                input.value = code;
+                applyCoupon();
+            }
         }
 
         function renderRecommendedInModals() {
@@ -1170,7 +1541,12 @@
             if (!cart.length) {
                 list.innerHTML = `<p class="text-center text-slate-400 py-8 text-xs">Your bag is empty.</p>`;
                 document.getElementById('cartTotalPrice').textContent = '₹0';
+                appliedCouponCode = "";
+                discountAmount = 0;
+                const msg = document.getElementById('couponMessage');
+                if (msg) msg.textContent = '';
                 renderRecommendedInModals();
+                renderAvailableCoupons();
                 return;
             }
             list.innerHTML = cart.map(item => {
@@ -1191,8 +1567,32 @@
                 `;
             }).join('');
 
+            revalidateAppliedCouponLocally();
             calculateCartTotal();
             renderRecommendedInModals();
+            renderAvailableCoupons();
+        }
+
+        function revalidateAppliedCouponLocally() {
+            if (!appliedCouponCode) return;
+            const subtotal = cart.reduce((sum, item) => sum + (parsePrice(item['Sale Price']) * item.qty), 0);
+            const found = (allCoupons || []).find(c => String(c['Coupon Code'] || c['code'] || '').trim().toUpperCase() === appliedCouponCode.toUpperCase());
+            if (found) {
+                const minOrder = parsePrice(found['Minimum Order Amount'] || found['minOrder']);
+                if (subtotal < minOrder) {
+                    appliedCouponCode = "";
+                    discountAmount = 0;
+                    const msg = document.getElementById('couponMessage');
+                    if (msg) {
+                        msg.className = "text-[11px] text-[#ff9500] font-medium";
+                        msg.textContent = `Coupon removed (Minimum order ₹${minOrder} required).`;
+                    }
+                } else {
+                    const type = String(found['Discount Type'] || found['type'] || '').toLowerCase();
+                    const val = parsePrice(found['Discount Value'] || found['value']);
+                    discountAmount = type.includes('percent') ? Math.round((subtotal * val) / 100) : val;
+                }
+            }
         }
 
         function updateQty(id, delta) {
@@ -1203,6 +1603,7 @@
                     cart = cart.filter(i => String(i['Product ID']) !== String(id));
                 }
             }
+            saveCartToStorage();
             updateCartUI();
         }
 
@@ -1218,14 +1619,19 @@
 
         function openCartModal() {
             renderRecommendedInModals();
+            renderAvailableCoupons();
             document.getElementById('cartModal').classList.remove('hidden');
         }
         function closeCartModal() { document.getElementById('cartModal').classList.add('hidden'); }
 
         async function applyCoupon() {
-            const code = document.getElementById('couponInput').value.trim();
+            const code = document.getElementById('couponInput').value.trim().toUpperCase();
             const subtotal = cart.reduce((sum, item) => sum + (parsePrice(item['Sale Price']) * item.qty), 0);
             if (!code) return;
+
+            const msg = document.getElementById('couponMessage');
+            msg.className = "text-[11px] text-slate-400";
+            msg.textContent = "Checking promo code...";
 
             try {
                 const res = await fetch(SCRIPT_URL, {
@@ -1234,19 +1640,20 @@
                     body: JSON.stringify({ action: "validateCoupon", code: code, cartTotal: subtotal })
                 });
                 const data = await res.json();
-                const msg = document.getElementById('couponMessage');
                 if (data.status === "success") {
                     appliedCouponCode = data.couponCode;
                     discountAmount = Number(data.discountAmount) || 0;
                     msg.className = "text-[11px] text-[#34c759] font-medium";
-                    msg.textContent = `Promo applied! You saved ₹${discountAmount}`;
+                    msg.textContent = `Promo ${appliedCouponCode} applied! You saved ₹${discountAmount}`;
                     calculateCartTotal();
+                    renderAvailableCoupons();
                 } else {
                     msg.className = "text-[11px] text-[#ff3b30] font-medium";
                     msg.textContent = data.message;
                 }
             } catch (err) {
                 console.error(err);
+                msg.textContent = "Could not verify coupon right now.";
             }
         }
 
@@ -1281,6 +1688,7 @@
             closeCartModal();
             updateCheckoutFieldsAndRecommends();
             document.getElementById('checkoutModal').classList.remove('hidden');
+            trackStoreEvent('InitiateCheckout');
         }
 
         function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
@@ -1308,6 +1716,9 @@
             });
 
             if (finalPaid <= 0) {
+                const btn = document.getElementById('payButton');
+                btn.disabled = true;
+                btn.textContent = "Processing Free Order...";
                 await submitOrderBackend({
                     name, email, phone, address,
                     paymentId: "FREE-COUPON-" + Date.now(),
@@ -1316,6 +1727,8 @@
                     discountAmount: discountAmount,
                     itemIds: purchasedItemIds
                 });
+                btn.disabled = false;
+                calculateCartTotal();
                 return;
             }
 
@@ -1356,6 +1769,21 @@
             rzp.open();
         }
 
+        function triggerConfettiCelebration() {
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+                setTimeout(() => {
+                    confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0 } });
+                    confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1 } });
+                }, 250);
+            }
+        }
+
+        function closeOrderSuccessModal() {
+            document.getElementById('orderSuccessModal').classList.add('hidden');
+            showSection('store');
+        }
+
         async function submitOrderBackend(orderData) {
             try {
                 const res = await fetch(SCRIPT_URL, {
@@ -1366,12 +1794,24 @@
                 const data = await res.json();
                 if (data.status === "success") {
                     closeCheckoutModal();
-                    alert(`Payment & Order Successful!\n\nOrder ID: ${data.orderId}\nYour Account Password: ${data.password}\n\n(We have also sent your product access links & login details to your email!)`);
+                    trackStoreEvent('Purchase', { value: orderData.totalPaid, currency: 'INR' });
+                    triggerConfettiCelebration();
+
+                    const detailsBox = document.getElementById('orderSuccessDetails');
+                    if (detailsBox) {
+                        detailsBox.innerHTML = `
+                            <div><strong>Order ID:</strong> <span class="text-[#0071e3] font-semibold">${data.orderId}</span></div>
+                            <div><strong>Account Email:</strong> ${orderData.email}</div>
+                            <div><strong>Account Password:</strong> <span class="bg-white px-2 py-0.5 rounded border border-slate-200 font-mono font-bold">${data.password}</span></div>
+                        `;
+                    }
+                    document.getElementById('orderSuccessModal').classList.remove('hidden');
+
                     cart = [];
+                    saveCartToStorage();
                     appliedCouponCode = "";
                     discountAmount = 0;
                     updateCartUI();
-                    showSection('store');
                 } else {
                     alert("Order recorded issue: " + data.message + "\nPlease contact WhatsApp support with your Payment ID: " + orderData.paymentId);
                 }
@@ -1460,9 +1900,7 @@
                         text: 'Save hadkart to your Home Screen for quick access!',
                         url: window.location.origin
                     });
-                } catch (err) {
-                    console.log("Share closed");
-                }
+                } catch (err) {}
             } else {
                 alert("To add hadkart to your Home Screen:\n\n• On iPhone/iPad (Safari): Tap the Share icon at the bottom and select 'Add to Home Screen'.\n• On Android (Chrome): Tap the menu dots (⋮) and select 'Add to Home Screen'.");
             }
@@ -1482,7 +1920,6 @@
 
         function initExitIntentAndTimer() {
             let popupShown = false;
-            // 5 Minute (300,000 ms) timer
             setTimeout(() => {
                 if (!popupShown) {
                     document.getElementById('exitPopup').classList.remove('modal-hidden');
@@ -1507,6 +1944,9 @@
             document.getElementById('productDetailSection').classList.add('hidden');
             document.getElementById('accountSection').classList.add('hidden');
             document.getElementById('legalSection').classList.remove('hidden');
+
+            const stickyBar = document.getElementById('mobileStickyBuyBar');
+            if (stickyBar) stickyBar.classList.add('hidden');
 
             const content = document.getElementById('legalContent');
             let title = "";
