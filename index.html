@@ -45,18 +45,40 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .chat-bubble-anim { animation: chatPop 0.3s ease-out forwards; }
+
+        /* Logo Breathing Animation for Splash Loader */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.9; filter: drop-shadow(0 4px 12px rgba(0, 113, 227, 0.15)); }
+            50% { transform: scale(1.12); opacity: 1; filter: drop-shadow(0 8px 24px rgba(0, 113, 227, 0.35)); }
+        }
+        .logo-breathe { animation: breathe 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased">
 
-    <!-- Top Minimalist Contact Banner & Navigation -->
-    <header class="sticky top-0 z-40 apple-glass border-b border-slate-200/60">
-        <div class="bg-[#1d1d1f] text-[#f5f5f7] text-xs py-2 px-4 text-center font-normal flex flex-col sm:flex-row items-center justify-center gap-2">
-            <span class="font-light">Looking for 3D plans, Home design or Construction works?</span>
-            <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20discuss%20regarding%203D%20plans%20and%20construction%20works." target="_blank" class="bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium px-3.5 py-1 rounded-full text-[11px] inline-flex items-center gap-1.5 transition">
-                <i class="fa-brands fa-whatsapp text-sm"></i> Contact Now
-            </a>
+    <!-- Initial Breathing Logo Loading Overlay -->
+    <div id="pageLoader" class="fixed inset-0 z-[100] bg-[#f5f5f7] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative flex flex-col items-center">
+            <img src="logo.png" onerror="this.src='https://via.placeholder.com/80/0071e3/ffffff?text=H'" alt="hadkart loading" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover logo-breathe">
+            <span class="mt-4 text-sm font-semibold tracking-tight text-[#1d1d1f] lowercase">hadkart</span>
+            <div class="mt-2 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 0ms;"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 150ms;"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 300ms;"></span>
+            </div>
         </div>
+    </div>
+
+    <!-- Top Contact Banner (Scrolls away on mobile, stays sticky on desktop if needed or scrolls smoothly) -->
+    <div class="bg-[#1d1d1f] text-[#f5f5f7] text-xs py-2 px-4 text-center font-normal flex flex-col sm:flex-row items-center justify-center gap-2 md:sticky md:top-0 md:z-50">
+        <span class="font-light">Looking for 3D plans, Home design or Construction works?</span>
+        <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20discuss%20regarding%203D%20plans%20and%20construction%20works." target="_blank" class="bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium px-3.5 py-1 rounded-full text-[11px] inline-flex items-center gap-1.5 transition">
+            <i class="fa-brands fa-whatsapp text-sm"></i> Contact Now
+        </a>
+    </div>
+
+    <!-- Sticky Main Navigation Bar (Always stays at top) -->
+    <header class="sticky top-0 md:top-[36px] z-40 apple-glass border-b border-slate-200/60">
         <div class="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between gap-4">
             <a href="#" onclick="showSection('store'); return false;" class="text-xl font-medium tracking-tight text-[#1d1d1f] flex items-center gap-2.5">
                 <img id="brandLogoImg" src="logo.png" onerror="this.src='https://via.placeholder.com/64/0071e3/ffffff?text=H'" alt="hadkart logo" class="w-8 h-8 rounded-lg object-cover shadow-sm">
@@ -84,14 +106,15 @@
                 </button>
             </div>
         </div>
-        <!-- Mobile Search -->
-        <div class="p-3 bg-white/80 border-t border-slate-200/40 md:hidden">
-            <div class="relative">
-                <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full pl-9 pr-4 py-1.5 bg-[#e8e8ed] border-0 rounded-full text-xs text-[#1d1d1f] focus:outline-none">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-            </div>
-        </div>
     </header>
+
+    <!-- Mobile Search Bar (Outside sticky header so it scrolls away naturally on mobile) -->
+    <div class="p-3 bg-white border-b border-slate-200/60 md:hidden">
+        <div class="relative max-w-7xl mx-auto">
+            <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full pl-9 pr-4 py-2 bg-[#e8e8ed] border-0 rounded-full text-xs text-[#1d1d1f] focus:outline-none">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+        </div>
+    </div>
 
     <!-- Main Content Area -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
@@ -252,7 +275,7 @@
         </button>
     </div>
 
-    <!-- Exit / 1-Minute Popup Modal -->
+    <!-- Exit / 5-Minute Popup Modal -->
     <div id="exitPopup" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 modal modal-hidden">
         <div class="bg-white max-w-sm w-full p-6 rounded-3xl shadow-2xl relative text-center border border-slate-100">
             <button onclick="closeExitPopup()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
@@ -420,6 +443,15 @@
         let deferredPrompt = null;
         let bannerIntervals = [];
 
+        // Hide Initial Page Loader Smoothly
+        function hidePageLoader() {
+            const loader = document.getElementById('pageLoader');
+            if (loader && !loader.classList.contains('opacity-0')) {
+                loader.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => { loader.style.display = 'none'; }, 500);
+            }
+        }
+
         // WhatsApp Auto-Chat Variables
         let waUnreadCount = 0;
         let audioCtx = null;
@@ -475,15 +507,10 @@
         }
 
         function initWhatsAppSequence() {
-            // 1st message at 10 seconds
             setTimeout(() => { triggerWaMessage(0); }, 10000);
-            // 2nd message at 1 minute (60s)
             setTimeout(() => { triggerWaMessage(1); }, 60000);
-            // 3rd message at 2 minutes (120s)
             setTimeout(() => { triggerWaMessage(2); }, 120000);
-            // 4th message at 3 minutes (180s)
             setTimeout(() => { triggerWaMessage(3); }, 180000);
-            // 5th message at 4 minutes (240s)
             setTimeout(() => { triggerWaMessage(4); }, 240000);
         }
 
@@ -569,6 +596,9 @@
             initWhatsAppSequence();
             window.addEventListener('hashchange', checkUrlHash);
 
+            // Safety fallback: hide loader after 3.5 seconds even if network is very slow
+            setTimeout(hidePageLoader, 3500);
+
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
@@ -586,6 +616,7 @@
                         renderProducts();
                         renderBanners();
                         checkUrlHash();
+                        setTimeout(hidePageLoader, 450);
                     }
                 }
             } catch (e) {
@@ -609,9 +640,11 @@
                     renderBanners();
                     renderProducts();
                     checkUrlHash();
+                    hidePageLoader();
                 }
             } catch (err) {
                 console.error("Error loading store data:", err);
+                hidePageLoader();
             }
         }
 
@@ -1449,7 +1482,7 @@
 
         function initExitIntentAndTimer() {
             let popupShown = false;
-            // 1 Minute (60,000 ms) timer
+            // 5 Minute (300,000 ms) timer
             setTimeout(() => {
                 if (!popupShown) {
                     document.getElementById('exitPopup').classList.remove('modal-hidden');
