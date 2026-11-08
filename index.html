@@ -1321,7 +1321,7 @@
 
                 return `
                     <div class="apple-card overflow-hidden flex flex-col justify-between group cursor-pointer" onclick="viewProductDetail('${prodId}')">
-                        <div class="relative overflow-hidden bg-slate-100 h-52">
+                        <div class="relative overflow-hidden bg-slate-100 aspect-square w-full">
                             <img src="${imgUrl}" alt="${p['Product Name']}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" ${index < 4 ? 'fetchpriority="high"' : 'loading="lazy"'}>
                             ${badgeText ? `<span class="absolute top-3 left-3 ${badgeColor} text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">${badgeText}</span>` : ''}
                             ${hasVideo ? `<span class="absolute bottom-2.5 right-2.5 bg-black/70 text-white text-[10px] font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-xs"><i class="fa-solid fa-play text-[8px]"></i> Video</span>` : ''}
@@ -1575,7 +1575,7 @@
                 const pSale = parsePrice(p['Sale Price']);
                 return `
                     <div onclick="viewProductDetail('${p['Product ID']}')" class="apple-card bg-white p-3.5 cursor-pointer min-w-[190px] max-w-[190px] flex-shrink-0 flex flex-col justify-between">
-                        <img src="${getFirstImage(p)}" class="w-full h-28 object-cover rounded-xl mb-2.5" loading="lazy">
+                        <img src="${getFirstImage(p)}" class="w-full aspect-square object-cover rounded-xl mb-2.5" loading="lazy">
                         <div>
                             <h4 class="font-semibold text-xs text-[#1d1d1f] line-clamp-1">${p['Product Name']}</h4>
                             <div class="text-xs font-semibold text-slate-600 mt-0.5">₹${pSale.toLocaleString('en-IN')}</div>
@@ -1621,7 +1621,7 @@
                 const salePrice = parsePrice(p['Sale Price']);
                 return `
                     <div class="apple-card overflow-hidden flex flex-col justify-between p-4 bg-white">
-                        <img src="${getFirstImage(p)}" onclick="viewProductDetail('${p['Product ID']}')" class="w-full h-40 object-cover rounded-xl mb-3 cursor-pointer" loading="lazy">
+                        <img src="${getFirstImage(p)}" onclick="viewProductDetail('${p['Product ID']}')" class="w-full aspect-square object-cover rounded-xl mb-3 cursor-pointer" loading="lazy">
                         <h3 class="font-semibold text-[#1d1d1f] text-xs line-clamp-1">${p['Product Name']}</h3>
                         <div class="text-xs font-semibold text-[#1d1d1f] mt-1">₹${salePrice.toLocaleString('en-IN')}</div>
                         <div class="grid grid-cols-2 gap-2 mt-3">
