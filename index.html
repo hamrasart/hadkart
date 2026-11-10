@@ -812,6 +812,21 @@
             if (ogUrl) ogUrl.setAttribute('content', window.location.href);
         }
 
+        // Handle Responsive Resizing for Banners
+        let lastBannerWidth = window.innerWidth;
+        window.addEventListener('resize', () => {
+            if (allBanners && allBanners.length > 0) {
+                const currentWidth = window.innerWidth;
+                const wasDesktop = lastBannerWidth >= 768;
+                const isNowDesktop = currentWidth >= 768;
+                // Only re-render banners if we cross the mobile/desktop breakpoint
+                if (wasDesktop !== isNowDesktop) {
+                    lastBannerWidth = currentWidth;
+                    renderBanners();
+                }
+            }
+        });
+
         window.addEventListener('DOMContentLoaded', () => {
             updateCartUI();
             updateNavAccountButton();
@@ -995,7 +1010,7 @@
             slides.forEach(slideGroup => {
                 html += `<div class="w-full flex-shrink-0 px-0" style="width: ${slideWidth}%;">`;
                 if (isPair) {
-                    html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full w-full">
+                    html += `<div class="grid grid-cols-2 gap-4 h-full w-full">
                         ${buildSingleBannerCard(slideGroup[0], aspectClass)}
                         ${buildSingleBannerCard(slideGroup[1], aspectClass)}
                     </div>`;
@@ -1105,10 +1120,12 @@
                 });
             }
 
+            const isDesktop = window.innerWidth >= 768;
+
             createCarousel(topMainEl, topMain, false, 'aspect-[21/9]', 2000);
-            createCarousel(topSlimEl, topSlim, true, 'aspect-[21/9]', 4000);
+            createCarousel(topSlimEl, topSlim, isDesktop, 'aspect-[21/9]', 4000);
             createCarousel(bottomMainEl, bottomMain, false, 'aspect-[21/9]', 2000);
-            createCarousel(bottomSlimEl, bottomSlim, true, 'aspect-[21/9]', 4000);
+            createCarousel(bottomSlimEl, bottomSlim, isDesktop, 'aspect-[21/9]', 4000);
         }
         // ==========================================
 
