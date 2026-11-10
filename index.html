@@ -30,8 +30,8 @@
 
     <!-- Meta Pixel & Google Analytics Integration Ready -->
     <script>
-        const META_PIXEL_ID = ""; // നിങ്ങളുടെ Meta Pixel ID ഉണ്ടെങ്കിൽ ഇവിടെ നൽകാം
-        const GA_MEASUREMENT_ID = ""; // നിങ്ങളുടെ Google Analytics ID ഉണ്ടെങ്കിൽ ഇവിടെ നൽകാം
+        const META_PIXEL_ID = ""; 
+        const GA_MEASUREMENT_ID = ""; 
 
         function trackStoreEvent(eventName, params = {}) {
             try {
@@ -950,7 +950,7 @@
         }
 
         // ==========================================
-        // PERFECTED BANNER RENDER LOGIC
+        // UPDATED BANNER RENDER LOGIC
         // ==========================================
         function renderBanners() {
             bannerIntervals.forEach(clearInterval);
@@ -966,50 +966,37 @@
             let bottomMain = [];
             let bottomSlim = [];
 
-            const hasExplicitPos = allBanners.some(b => b['Position'] || b['Section'] || b['Banner Type'] || b['Type']);
+            // 1. ഫിൽറ്ററിംഗ് (Inactive ഒഴിവാക്കാൻ) & ഓർഡർ സെറ്റ് ചെയ്യാൻ
+            let activeBanners = allBanners.filter(b => {
+                const status = String(b['Status'] || b['status'] || 'Active').toLowerCase().trim();
+                return status !== 'inactive';
+            });
 
-            if (hasExplicitPos) {
-                allBanners.forEach(b => {
-                    const posStr = String(b['Position'] || b['Section'] || b['Banner Type'] || b['Type'] || '').toLowerCase().trim();
+            activeBanners.sort((a, b) => {
+                const orderA = parseInt(a['Slide Order'] || a['Order'] || 99) || 99;
+                const orderB = parseInt(b['Slide Order'] || b['Order'] || 99) || 99;
+                return orderA - orderB;
+            });
+
+            // 2. Banner Section കൃത്യമായി മനസ്സിലാക്കാൻ
+            if (activeBanners.length) {
+                activeBanners.forEach(b => {
+                    // ഇവിടെയാണ് സ്പ്രെഡ്ഷീറ്റിലെ "Banner Section" കോഡ് ചെക്ക് ചെയ്യുന്നത്
+                    const posStr = String(b['Banner Section'] || b['Position'] || b['Section'] || b['Banner Type'] || b['Type'] || '').toLowerCase().trim();
                     const cleanPos = posStr.replace(/[-\s_]/g, ''); 
                     
-                    if (cleanPos.includes('top1') || cleanPos.includes('topmain') || cleanPos === 'main' || cleanPos === 'top') {
+                    if (cleanPos === 'top1' || cleanPos === 'topmain' || cleanPos === 'main') {
                         topMain.push(b);
-                    } else if (cleanPos.includes('top2') || cleanPos.includes('topslim') || cleanPos === 'slim') {
+                    } else if (cleanPos === 'top2' || cleanPos === 'topslim' || cleanPos === 'slim') {
                         topSlim.push(b);
-                    } else if (cleanPos.includes('bottom1') || cleanPos.includes('bottommain') || cleanPos === 'bottom' || cleanPos === 'footer') {
+                    } else if (cleanPos === 'bottom1' || cleanPos === 'bottommain' || cleanPos === 'bottom') {
                         bottomMain.push(b);
-                    } else if (cleanPos.includes('bottom2') || cleanPos.includes('bottomslim')) {
+                    } else if (cleanPos === 'bottom2' || cleanPos === 'bottomslim') {
                         bottomSlim.push(b);
-                    } else {
+                    } else if (cleanPos !== '') {
                         topMain.push(b);
                     }
                 });
-            } else {
-                // Auto-Fallback Logic (If no exact positions are given)
-                if (allBanners.length === 1) {
-                    topMain = [allBanners[0]];
-                } else if (allBanners.length === 2) {
-                    topMain = [allBanners[0]];
-                    bottomMain = [allBanners[1]];
-                } else if (allBanners.length === 3) {
-                    topMain = [allBanners[0]];
-                    topSlim = [allBanners[1], allBanners[2]];
-                } else if (allBanners.length === 4) {
-                    topMain = [allBanners[0]];
-                    topSlim = [allBanners[1], allBanners[2]];
-                    bottomMain = [allBanners[3]];
-                } else if (allBanners.length === 5) {
-                    topMain = [allBanners[0]];
-                    topSlim = [allBanners[1], allBanners[2]];
-                    bottomSlim = [allBanners[3], allBanners[4]];
-                } else {
-                    topMain = [allBanners[0], allBanners[3]].filter(Boolean);
-                    topSlim = [allBanners[1], allBanners[2], allBanners[4], allBanners[5]].filter(Boolean);
-                    bottomMain = allBanners.slice(6, 8);
-                    bottomSlim = allBanners.slice(8);
-                    if (bottomMain.length === 0 && allBanners[5]) bottomMain = [allBanners[5]];
-                }
             }
 
             function buildSingleBannerCard(b, heightClass, animClass = 'banner-slide') {
@@ -1032,9 +1019,15 @@
                 `;
             }
 
+            // 1. Top Main Banner (Slider)
             let topMainIdx = 0;
             function renderTopMain(dir = 1) {
-                if (!topMain.length) { topMainEl.innerHTML = ''; return; }
+                if (!topMain.length) { 
+                    topMainEl.style.display = 'none'; 
+                    topMainEl.innerHTML = ''; 
+                    return; 
+                }
+                topMainEl.style.display = 'block';
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 const current = topMain[((topMainIdx % topMain.length) + topMain.length) % topMain.length];
                 topMainEl.innerHTML = buildSingleBannerCard(current, 'aspect-[21/9]', anim);
@@ -1052,9 +1045,15 @@
                 });
             }
 
+            // 2. Top Slim Banners (Pairs)
             let topSlimIdx = 0;
             function renderTopSlim(dir = 1) {
-                if (!topSlim.length) { topSlimEl.innerHTML = ''; return; }
+                if (!topSlim.length) { 
+                    topSlimEl.style.display = 'none'; 
+                    topSlimEl.innerHTML = ''; 
+                    return; 
+                }
+                topSlimEl.style.display = 'block';
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 if (topSlim.length === 1) {
                     topSlimEl.innerHTML = buildSingleBannerCard(topSlim[0], 'aspect-[2/1]', anim);
@@ -1088,9 +1087,15 @@
                 });
             }
 
+            // 3. Bottom Main Banner (Slider)
             let bottomMainIdx = 0;
             function renderBottomMain(dir = 1) {
-                if (!bottomMain.length) { bottomMainEl.innerHTML = ''; return; }
+                if (!bottomMain.length) { 
+                    bottomMainEl.style.display = 'none'; 
+                    bottomMainEl.innerHTML = ''; 
+                    return; 
+                }
+                bottomMainEl.style.display = 'block';
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 const len = bottomMain.length;
                 const current = bottomMain[((bottomMainIdx % len) + len) % len];
@@ -1109,9 +1114,15 @@
                 });
             }
 
+            // 4. Bottom Slim Banners (Pairs)
             let bottomSlimIdx = 0;
             function renderBottomSlim(dir = 1) {
-                if (!bottomSlim.length) { bottomSlimEl.innerHTML = ''; return; }
+                if (!bottomSlim.length) { 
+                    bottomSlimEl.style.display = 'none'; 
+                    bottomSlimEl.innerHTML = ''; 
+                    return; 
+                }
+                bottomSlimEl.style.display = 'block';
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 if (bottomSlim.length === 1) {
                     bottomSlimEl.innerHTML = buildSingleBannerCard(bottomSlim[0], 'aspect-[2/1]', anim);
