@@ -103,7 +103,7 @@
         </div>
     </div>
 
-    <!-- Top Contact Banner (Scrolls away on mobile) -->
+    <!-- Top Contact Banner -->
     <div class="bg-[#1d1d1f] text-[#f5f5f7] text-xs py-2 px-4 text-center font-normal flex flex-col sm:flex-row items-center justify-center gap-2 md:sticky md:top-0 md:z-50">
         <span class="font-light">Looking for 3D plans, Home design or Construction works?</span>
         <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20discuss%20regarding%203D%20plans%20and%20construction%20works." target="_blank" class="bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium px-3.5 py-1 rounded-full text-[11px] inline-flex items-center gap-1.5 transition">
@@ -119,7 +119,7 @@
                 <span class="lowercase tracking-normal font-semibold text-lg">hadkart</span>
             </a>
 
-            <!-- Desktop Search Bar with Auto-Suggestions -->
+            <!-- Desktop Search Bar -->
             <div class="flex-1 max-w-sm relative hidden md:block">
                 <input type="text" id="searchInput" oninput="handleSearch(this.value, 'desktopSearchSuggestions')" onfocus="handleSearch(this.value, 'desktopSearchSuggestions')" placeholder="Search products, tags, 3d plans, e-books..." autocomplete="off" class="w-full pl-9 pr-4 py-1.5 bg-[#e8e8ed] border-0 rounded-full text-xs text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50 transition">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
@@ -143,7 +143,7 @@
         </div>
     </header>
 
-    <!-- Mobile Search Bar with Auto-Suggestions (Scrolls away naturally on mobile) -->
+    <!-- Mobile Search Bar -->
     <div class="p-3 bg-white border-b border-slate-200/60 md:hidden relative z-30">
         <div class="relative max-w-7xl mx-auto">
             <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value, 'mobileSearchSuggestions')" onfocus="handleSearch(this.value, 'mobileSearchSuggestions')" placeholder="Search products or #tags..." autocomplete="off" class="w-full pl-9 pr-4 py-2 bg-[#e8e8ed] border-0 rounded-full text-xs text-[#1d1d1f] focus:outline-none">
@@ -187,7 +187,7 @@
                 </div>
             </div>
 
-            <!-- Active Filter Pill (Shows when search or tag is clicked) -->
+            <!-- Active Filter Pill -->
             <div id="activeSearchBadgeContainer" class="mb-6 hidden flex items-center gap-2">
                 <span class="text-xs font-medium text-slate-500">Filtered by:</span>
                 <span class="bg-[#0071e3] text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-2 shadow-xs">
@@ -330,7 +330,7 @@
         </button>
     </div>
 
-    <!-- FULL SCREEN LIGHTBOX MODAL (New) -->
+    <!-- FULL SCREEN LIGHTBOX MODAL -->
     <div id="lightboxModal" class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/70 hover:text-white text-4xl z-10 transition"><i class="fa-solid fa-xmark"></i></button>
         <img id="lightboxImage" src="" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl transition-transform duration-300 scale-95" draggable="false">
@@ -950,7 +950,7 @@
         }
 
         // ==========================================
-        // UPDATED BANNER RENDER LOGIC
+        // PERFECTED BANNER RENDER LOGIC
         // ==========================================
         function renderBanners() {
             bannerIntervals.forEach(clearInterval);
@@ -966,25 +966,50 @@
             let bottomMain = [];
             let bottomSlim = [];
 
-            if (allBanners.length) {
+            const hasExplicitPos = allBanners.some(b => b['Position'] || b['Section'] || b['Banner Type'] || b['Type']);
+
+            if (hasExplicitPos) {
                 allBanners.forEach(b => {
                     const posStr = String(b['Position'] || b['Section'] || b['Banner Type'] || b['Type'] || '').toLowerCase().trim();
-                    // Remove all spaces, hyphens, and underscores for strict exact matching
                     const cleanPos = posStr.replace(/[-\s_]/g, ''); 
                     
-                    if (cleanPos === 'top1' || cleanPos === 'topmain' || cleanPos === 'main') {
+                    if (cleanPos.includes('top1') || cleanPos.includes('topmain') || cleanPos === 'main' || cleanPos === 'top') {
                         topMain.push(b);
-                    } else if (cleanPos === 'top2' || cleanPos === 'topslim' || cleanPos === 'slim') {
+                    } else if (cleanPos.includes('top2') || cleanPos.includes('topslim') || cleanPos === 'slim') {
                         topSlim.push(b);
-                    } else if (cleanPos === 'bottom1' || cleanPos === 'bottommain' || cleanPos === 'bottom') {
+                    } else if (cleanPos.includes('bottom1') || cleanPos.includes('bottommain') || cleanPos === 'bottom' || cleanPos === 'footer') {
                         bottomMain.push(b);
-                    } else if (cleanPos === 'bottom2' || cleanPos === 'bottomslim') {
+                    } else if (cleanPos.includes('bottom2') || cleanPos.includes('bottomslim')) {
                         bottomSlim.push(b);
-                    } else if (cleanPos !== '') {
-                        // Fallback if they write something unrecognized
+                    } else {
                         topMain.push(b);
                     }
                 });
+            } else {
+                // Auto-Fallback Logic (If no exact positions are given)
+                if (allBanners.length === 1) {
+                    topMain = [allBanners[0]];
+                } else if (allBanners.length === 2) {
+                    topMain = [allBanners[0]];
+                    bottomMain = [allBanners[1]];
+                } else if (allBanners.length === 3) {
+                    topMain = [allBanners[0]];
+                    topSlim = [allBanners[1], allBanners[2]];
+                } else if (allBanners.length === 4) {
+                    topMain = [allBanners[0]];
+                    topSlim = [allBanners[1], allBanners[2]];
+                    bottomMain = [allBanners[3]];
+                } else if (allBanners.length === 5) {
+                    topMain = [allBanners[0]];
+                    topSlim = [allBanners[1], allBanners[2]];
+                    bottomSlim = [allBanners[3], allBanners[4]];
+                } else {
+                    topMain = [allBanners[0], allBanners[3]].filter(Boolean);
+                    topSlim = [allBanners[1], allBanners[2], allBanners[4], allBanners[5]].filter(Boolean);
+                    bottomMain = allBanners.slice(6, 8);
+                    bottomSlim = allBanners.slice(8);
+                    if (bottomMain.length === 0 && allBanners[5]) bottomMain = [allBanners[5]];
+                }
             }
 
             function buildSingleBannerCard(b, heightClass, animClass = 'banner-slide') {
@@ -1007,15 +1032,9 @@
                 `;
             }
 
-            // 1. Top Main Banner (Slider if > 1)
             let topMainIdx = 0;
             function renderTopMain(dir = 1) {
-                if (!topMain.length) { 
-                    topMainEl.style.display = 'none'; 
-                    topMainEl.innerHTML = ''; 
-                    return; 
-                }
-                topMainEl.style.display = 'block';
+                if (!topMain.length) { topMainEl.innerHTML = ''; return; }
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 const current = topMain[((topMainIdx % topMain.length) + topMain.length) % topMain.length];
                 topMainEl.innerHTML = buildSingleBannerCard(current, 'aspect-[21/9]', anim);
@@ -1033,15 +1052,9 @@
                 });
             }
 
-            // 2. Top Slim Banners (Pairs, Slider if > 2)
             let topSlimIdx = 0;
             function renderTopSlim(dir = 1) {
-                if (!topSlim.length) { 
-                    topSlimEl.style.display = 'none'; 
-                    topSlimEl.innerHTML = ''; 
-                    return; 
-                }
-                topSlimEl.style.display = 'block';
+                if (!topSlim.length) { topSlimEl.innerHTML = ''; return; }
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 if (topSlim.length === 1) {
                     topSlimEl.innerHTML = buildSingleBannerCard(topSlim[0], 'aspect-[2/1]', anim);
@@ -1075,15 +1088,9 @@
                 });
             }
 
-            // 3. Bottom Main Banner (Slider if > 1)
             let bottomMainIdx = 0;
             function renderBottomMain(dir = 1) {
-                if (!bottomMain.length) { 
-                    bottomMainEl.style.display = 'none'; 
-                    bottomMainEl.innerHTML = ''; 
-                    return; 
-                }
-                bottomMainEl.style.display = 'block';
+                if (!bottomMain.length) { bottomMainEl.innerHTML = ''; return; }
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 const len = bottomMain.length;
                 const current = bottomMain[((bottomMainIdx % len) + len) % len];
@@ -1102,15 +1109,9 @@
                 });
             }
 
-            // 4. Bottom Slim Banners (Pairs, Slider if > 2)
             let bottomSlimIdx = 0;
             function renderBottomSlim(dir = 1) {
-                if (!bottomSlim.length) { 
-                    bottomSlimEl.style.display = 'none'; 
-                    bottomSlimEl.innerHTML = ''; 
-                    return; 
-                }
-                bottomSlimEl.style.display = 'block';
+                if (!bottomSlim.length) { bottomSlimEl.innerHTML = ''; return; }
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 if (bottomSlim.length === 1) {
                     bottomSlimEl.innerHTML = buildSingleBannerCard(bottomSlim[0], 'aspect-[2/1]', anim);
