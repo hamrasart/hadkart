@@ -30,8 +30,8 @@
 
     <!-- Meta Pixel & Google Analytics Integration Ready -->
     <script>
-        const META_PIXEL_ID = ""; 
-        const GA_MEASUREMENT_ID = ""; 
+        const META_PIXEL_ID = ""; // നിങ്ങളുടെ Meta Pixel ID ഉണ്ടെങ്കിൽ ഇവിടെ നൽകാം
+        const GA_MEASUREMENT_ID = ""; // നിങ്ങളുടെ Google Analytics ID ഉണ്ടെങ്കിൽ ഇവിടെ നൽകാം
 
         function trackStoreEvent(eventName, params = {}) {
             try {
@@ -51,15 +51,11 @@
         .apple-btn { background-color: #0071e3; color: white; border-radius: 980px; transition: all 0.2s ease; }
         .apple-btn:hover { background-color: #0077ed; transform: scale(1.02); }
         
-        .banner-slide { animation: slideInRight 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes slideInRight {
-            from { opacity: 0.35; transform: translateX(25px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .banner-slide-prev { animation: slideInLeft 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes slideInLeft {
-            from { opacity: 0.35; transform: translateX(-25px); }
-            to { opacity: 1; transform: translateX(0); }
+        /* New Smooth Fade Animation for Banners */
+        .banner-fade { animation: fadeSmooth 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes fadeSmooth {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
         }
         
         @keyframes pulse {
@@ -158,13 +154,14 @@
         <!-- STORE SECTION -->
         <div id="storeSection">
             
-            <!-- TOP BANNERS (Touch Swipeable) -->
+            <!-- TOP BANNERS -->
             <div id="topBannersWrapper" class="mb-10 space-y-4">
                 <div id="topMainBannerContainer" class="touch-pan-y">
                     <div class="w-full aspect-[21/9] rounded-2xl skeleton"></div>
                 </div>
+                <!-- Updated Mobile 2-column grid -->
                 <div id="topSlimBannerContainer" class="touch-pan-y">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-3 md:gap-4">
                         <div class="w-full aspect-[2/1] rounded-2xl skeleton"></div>
                         <div class="w-full aspect-[2/1] rounded-2xl skeleton"></div>
                     </div>
@@ -207,7 +204,7 @@
             <!-- Pagination Controls -->
             <div id="paginationContainer" class="flex justify-center items-center flex-wrap gap-2 mt-12"></div>
 
-            <!-- BOTTOM BANNERS (Touch Swipeable) -->
+            <!-- BOTTOM BANNERS -->
             <div id="bottomBannersWrapper" class="mt-14 space-y-4">
                 <div id="bottomMainBannerContainer" class="touch-pan-y"></div>
                 <div id="bottomSlimBannerContainer" class="touch-pan-y"></div>
@@ -262,7 +259,7 @@
         </div>
     </main>
 
-    <!-- Sticky Mobile Bottom Buy Bar (Only visible on Mobile Product Detail Page) -->
+    <!-- Sticky Mobile Bottom Buy Bar -->
     <div id="mobileStickyBuyBar" class="fixed bottom-0 left-0 right-0 z-40 apple-glass border-t border-slate-200/80 p-3 px-4 md:hidden hidden flex items-center justify-between gap-3 shadow-2xl">
         <div class="overflow-hidden">
             <div id="stickyBarTitle" class="text-[11px] font-medium text-slate-500 truncate max-w-[130px]">Product</div>
@@ -950,7 +947,7 @@
         }
 
         // ==========================================
-        // UPDATED BANNER RENDER LOGIC
+        // PERFECTED BANNER RENDER LOGIC
         // ==========================================
         function renderBanners() {
             bannerIntervals.forEach(clearInterval);
@@ -966,8 +963,7 @@
             let bottomMain = [];
             let bottomSlim = [];
 
-            // 1. ഫിൽറ്ററിംഗ് (Inactive ഒഴിവാക്കാൻ) & ഓർഡർ സെറ്റ് ചെയ്യാൻ
-            let activeBanners = allBanners.filter(b => {
+            const activeBanners = allBanners.filter(b => {
                 const status = String(b['Status'] || b['status'] || 'Active').toLowerCase().trim();
                 return status !== 'inactive';
             });
@@ -978,10 +974,8 @@
                 return orderA - orderB;
             });
 
-            // 2. Banner Section കൃത്യമായി മനസ്സിലാക്കാൻ
             if (activeBanners.length) {
                 activeBanners.forEach(b => {
-                    // ഇവിടെയാണ് സ്പ്രെഡ്ഷീറ്റിലെ "Banner Section" കോഡ് ചെക്ക് ചെയ്യുന്നത്
                     const posStr = String(b['Banner Section'] || b['Position'] || b['Section'] || b['Banner Type'] || b['Type'] || '').toLowerCase().trim();
                     const cleanPos = posStr.replace(/[-\s_]/g, ''); 
                     
@@ -999,7 +993,8 @@
                 });
             }
 
-            function buildSingleBannerCard(b, heightClass, animClass = 'banner-slide') {
+            // Updated function: No target="_blank", added smooth 'banner-fade' class
+            function buildSingleBannerCard(b, heightClass, animClass = 'banner-fade') {
                 if (!b) return '';
                 const img = b['Image URL'] || b['Image URLs'] || '';
                 const title = b['Banner Title'] || b['Title'] || 'Featured Banner';
@@ -1007,7 +1002,7 @@
                 
                 if (link && link !== '#') {
                     return `
-                        <a href="${link}" target="_blank" rel="noopener noreferrer" draggable="false" class="block w-full rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/60 ${animClass} cursor-pointer hover:opacity-95 transition">
+                        <a href="${link}" draggable="false" class="block w-full rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/60 ${animClass} cursor-pointer hover:opacity-95 transition">
                             <img src="${img}" alt="${title}" draggable="false" class="w-full h-full object-cover pointer-events-none">
                         </a>
                     `;
@@ -1019,53 +1014,50 @@
                 `;
             }
 
-            // 1. Top Main Banner (Slider)
             let topMainIdx = 0;
-            function renderTopMain(dir = 1) {
+            function renderTopMain() {
                 if (!topMain.length) { 
                     topMainEl.style.display = 'none'; 
                     topMainEl.innerHTML = ''; 
                     return; 
                 }
                 topMainEl.style.display = 'block';
-                const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 const current = topMain[((topMainIdx % topMain.length) + topMain.length) % topMain.length];
-                topMainEl.innerHTML = buildSingleBannerCard(current, 'aspect-[21/9]', anim);
+                topMainEl.innerHTML = buildSingleBannerCard(current, 'aspect-[21/9]', 'banner-fade');
             }
             renderTopMain();
             if (topMain.length > 1) {
-                let tmTimer = setInterval(() => { topMainIdx++; renderTopMain(1); }, 3800);
+                let tmTimer = setInterval(() => { topMainIdx++; renderTopMain(); }, 4000);
                 bannerIntervals.push(tmTimer);
                 attachSwipeGesture(topMainEl, topMain.length, (dir) => {
                     clearInterval(tmTimer);
                     topMainIdx += dir;
-                    renderTopMain(dir);
-                    tmTimer = setInterval(() => { topMainIdx++; renderTopMain(1); }, 3800);
+                    renderTopMain();
+                    tmTimer = setInterval(() => { topMainIdx++; renderTopMain(); }, 4000);
                     bannerIntervals.push(tmTimer);
                 });
             }
 
-            // 2. Top Slim Banners (Pairs)
             let topSlimIdx = 0;
-            function renderTopSlim(dir = 1) {
+            function renderTopSlim() {
                 if (!topSlim.length) { 
                     topSlimEl.style.display = 'none'; 
                     topSlimEl.innerHTML = ''; 
                     return; 
                 }
                 topSlimEl.style.display = 'block';
-                const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 if (topSlim.length === 1) {
-                    topSlimEl.innerHTML = buildSingleBannerCard(topSlim[0], 'aspect-[2/1]', anim);
+                    topSlimEl.innerHTML = buildSingleBannerCard(topSlim[0], 'aspect-[2/1]', 'banner-fade');
                     return;
                 }
                 const len = topSlim.length;
                 const leftB = topSlim[((topSlimIdx % len) + len) % len];
                 const rightB = topSlim[(((topSlimIdx + 1) % len) + len) % len];
+                // Changed from grid-cols-1 to grid-cols-2 for mobile
                 topSlimEl.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${buildSingleBannerCard(leftB, 'aspect-[2/1]', anim)}
-                        ${buildSingleBannerCard(rightB, 'aspect-[2/1]', anim)}
+                    <div class="grid grid-cols-2 gap-3 md:gap-4">
+                        ${buildSingleBannerCard(leftB, 'aspect-[2/1]', 'banner-fade')}
+                        ${buildSingleBannerCard(rightB, 'aspect-[2/1]', 'banner-fade')}
                     </div>
                 `;
             }
@@ -1073,68 +1065,65 @@
             if (topSlim.length > 1) {
                 let tsTimer = null;
                 if (topSlim.length > 2) {
-                    tsTimer = setInterval(() => { topSlimIdx += 2; renderTopSlim(1); }, 4500);
+                    tsTimer = setInterval(() => { topSlimIdx += 2; renderTopSlim(); }, 4500);
                     bannerIntervals.push(tsTimer);
                 }
                 attachSwipeGesture(topSlimEl, topSlim.length, (dir) => {
                     if (tsTimer) clearInterval(tsTimer);
                     topSlimIdx += dir;
-                    renderTopSlim(dir);
+                    renderTopSlim();
                     if (topSlim.length > 2) {
-                        tsTimer = setInterval(() => { topSlimIdx += 2; renderTopSlim(1); }, 4500);
+                        tsTimer = setInterval(() => { topSlimIdx += 2; renderTopSlim(); }, 4500);
                         bannerIntervals.push(tsTimer);
                     }
                 });
             }
 
-            // 3. Bottom Main Banner (Slider)
             let bottomMainIdx = 0;
-            function renderBottomMain(dir = 1) {
+            function renderBottomMain() {
                 if (!bottomMain.length) { 
                     bottomMainEl.style.display = 'none'; 
                     bottomMainEl.innerHTML = ''; 
                     return; 
                 }
                 bottomMainEl.style.display = 'block';
-                const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 const len = bottomMain.length;
                 const current = bottomMain[((bottomMainIdx % len) + len) % len];
-                bottomMainEl.innerHTML = buildSingleBannerCard(current, 'aspect-[21/9]', anim);
+                bottomMainEl.innerHTML = buildSingleBannerCard(current, 'aspect-[21/9]', 'banner-fade');
             }
             renderBottomMain();
             if (bottomMain.length > 1) {
-                let bmTimer = setInterval(() => { bottomMainIdx++; renderBottomMain(1); }, 4200);
+                let bmTimer = setInterval(() => { bottomMainIdx++; renderBottomMain(); }, 4200);
                 bannerIntervals.push(bmTimer);
                 attachSwipeGesture(bottomMainEl, bottomMain.length, (dir) => {
                     clearInterval(bmTimer);
                     bottomMainIdx += dir;
-                    renderBottomMain(dir);
-                    bmTimer = setInterval(() => { bottomMainIdx++; renderBottomMain(1); }, 4200);
+                    renderBottomMain();
+                    bmTimer = setInterval(() => { bottomMainIdx++; renderBottomMain(); }, 4200);
                     bannerIntervals.push(bmTimer);
                 });
             }
 
-            // 4. Bottom Slim Banners (Pairs)
             let bottomSlimIdx = 0;
-            function renderBottomSlim(dir = 1) {
+            function renderBottomSlim() {
                 if (!bottomSlim.length) { 
                     bottomSlimEl.style.display = 'none'; 
                     bottomSlimEl.innerHTML = ''; 
                     return; 
                 }
                 bottomSlimEl.style.display = 'block';
-                const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 if (bottomSlim.length === 1) {
-                    bottomSlimEl.innerHTML = buildSingleBannerCard(bottomSlim[0], 'aspect-[2/1]', anim);
+                    bottomSlimEl.innerHTML = buildSingleBannerCard(bottomSlim[0], 'aspect-[2/1]', 'banner-fade');
                     return;
                 }
                 const len = bottomSlim.length;
                 const leftB = bottomSlim[((bottomSlimIdx % len) + len) % len];
                 const rightB = bottomSlim[(((bottomSlimIdx + 1) % len) + len) % len];
+                // Changed from grid-cols-1 to grid-cols-2 for mobile
                 bottomSlimEl.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${buildSingleBannerCard(leftB, 'aspect-[2/1]', anim)}
-                        ${buildSingleBannerCard(rightB, 'aspect-[2/1]', anim)}
+                    <div class="grid grid-cols-2 gap-3 md:gap-4">
+                        ${buildSingleBannerCard(leftB, 'aspect-[2/1]', 'banner-fade')}
+                        ${buildSingleBannerCard(rightB, 'aspect-[2/1]', 'banner-fade')}
                     </div>
                 `;
             }
@@ -1142,15 +1131,15 @@
             if (bottomSlim.length > 1) {
                 let bsTimer = null;
                 if (bottomSlim.length > 2) {
-                    bsTimer = setInterval(() => { bottomSlimIdx += 2; renderBottomSlim(1); }, 4500);
+                    bsTimer = setInterval(() => { bottomSlimIdx += 2; renderBottomSlim(); }, 4500);
                     bannerIntervals.push(bsTimer);
                 }
                 attachSwipeGesture(bottomSlimEl, bottomSlim.length, (dir) => {
                     if (bsTimer) clearInterval(bsTimer);
                     bottomSlimIdx += dir;
-                    renderBottomSlim(dir);
+                    renderBottomSlim();
                     if (bottomSlim.length > 2) {
-                        bsTimer = setInterval(() => { bottomSlimIdx += 2; renderBottomSlim(1); }, 4500);
+                        bsTimer = setInterval(() => { bottomSlimIdx += 2; renderBottomSlim(); }, 4500);
                         bannerIntervals.push(bsTimer);
                     }
                 });
