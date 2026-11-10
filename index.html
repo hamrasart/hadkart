@@ -1238,7 +1238,7 @@
             }
 
             let gridHtml = '';
-            let adCounter = 0; // For rotating ads
+            let adCounter = 0; 
 
             paginatedItems.forEach((p, index) => {
                 const prodId = p['Product ID'] || `ITEM-${index}`;
@@ -1303,7 +1303,7 @@
                     
                     gridHtml += `
                         <div class="apple-card overflow-hidden flex flex-col group relative bg-slate-100 cursor-pointer shadow-sm border border-slate-200/60" onclick="if('${adLink}' !== '#') window.location.href='${adLink}'">
-                            <div class="relative overflow-hidden w-full aspect-[4/5] bg-slate-200">
+                            <div class="relative overflow-hidden w-full flex-1 bg-slate-200">
                                 <img src="${adImg}" alt="Advertisement" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
                                 <span class="absolute top-3 left-3 bg-black/50 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider shadow-sm border border-white/10">Ad</span>
                             </div>
