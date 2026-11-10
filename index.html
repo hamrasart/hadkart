@@ -51,13 +51,6 @@
         .apple-btn { background-color: #0071e3; color: white; border-radius: 980px; transition: all 0.2s ease; }
         .apple-btn:hover { background-color: #0077ed; transform: scale(1.02); }
         
-        /* Smooth Fade Animation for Banners */
-        @keyframes fadeEffect {
-            from { opacity: 0.3; }
-            to { opacity: 1; }
-        }
-        .banner-fade { animation: fadeEffect 0.6s ease-in-out forwards; }
-        
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.45; }
@@ -80,8 +73,9 @@
         }
         .logo-breathe { animation: breathe 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         .touch-pan-y { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-        .snap-x-mandatory { scroll-snap-type: x mandatory; }
-        .snap-center { scroll-snap-align: center; }
+        
+        /* Added for Carousel Slider */
+        .slider-track { will-change: transform; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased pb-16 md:pb-0">
@@ -154,7 +148,7 @@
         <!-- STORE SECTION -->
         <div id="storeSection">
             
-            <!-- TOP BANNERS -->
+            <!-- TOP BANNERS (True Slide Carousels) -->
             <div id="topBannersWrapper" class="mb-10 space-y-4">
                 <div id="topMainBannerContainer" class="touch-pan-y">
                     <div class="w-full aspect-[21/9] rounded-2xl skeleton"></div>
@@ -563,7 +557,7 @@
 
         let allProducts = [];
         let allBanners = [];
-        let allAds = []; // New variable to store Ads
+        let allAds = []; 
         let allCoupons = [...DEFAULT_SHEET_COUPONS];
         let cart = JSON.parse(localStorage.getItem('hadkart_cart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('hadkart_wishlist')) || [];
@@ -842,7 +836,7 @@
                     if (parsed.products && parsed.products.length) {
                         allProducts = parsed.products;
                         allBanners = parsed.banners || [];
-                        allAds = parsed.ads || []; // Loading ads from cache
+                        allAds = parsed.ads || []; 
                         if (parsed.coupons && parsed.coupons.length) {
                             allCoupons = parsed.coupons;
                         }
@@ -865,7 +859,7 @@
                 if (data.status === "success") {
                     allProducts = (data.products || []).filter(p => p['Product ID'] || p['Product Name']);
                     allBanners = data.banners || [];
-                    allAds = data.ads || []; // Storing new ads
+                    allAds = data.ads || []; 
                     if (Array.isArray(data.coupons)) {
                         allCoupons = data.coupons;
                     }
@@ -1308,12 +1302,12 @@
                     const adImg = ad['Image URL'];
                     
                     gridHtml += `
-                        <div class="apple-card overflow-hidden flex flex-col group relative bg-slate-100 cursor-pointer shadow-sm border border-slate-200/60" onclick="if('${adLink}' !== '#') window.open('${adLink}', '_blank')">
+                        <div class="apple-card overflow-hidden flex flex-col group relative bg-slate-100 cursor-pointer shadow-sm border border-slate-200/60" onclick="if('${adLink}' !== '#') window.location.href='${adLink}'">
                             <div class="relative overflow-hidden w-full aspect-[4/5] bg-slate-200">
                                 <img src="${adImg}" alt="Advertisement" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
                                 <span class="absolute top-3 left-3 bg-black/50 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider shadow-sm border border-white/10">Ad</span>
                             </div>
-                            <div class="absolute bottom-0 left-0 right-0 bg-white/75 backdrop-blur-lg border-t border-white/40 p-3 flex items-center justify-between transition-colors group-hover:bg-white/95" onclick="event.stopPropagation(); window.open('https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20feature%20my%20brand%20on%20your%20store.', '_blank')">
+                            <div class="absolute bottom-0 left-0 right-0 bg-white/75 backdrop-blur-lg border-t border-white/40 p-3 flex items-center justify-between transition-colors group-hover:bg-white/95" onclick="event.stopPropagation(); window.location.href='https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20feature%20my%20brand%20on%20your%20store.'">
                                 <span class="text-[10.5px] font-bold text-slate-800 tracking-tight">Want to feature your brand here?</span>
                                 <div class="w-6 h-6 rounded-full bg-[#25d366] flex items-center justify-center text-white shadow-sm shrink-0">
                                     <i class="fa-brands fa-whatsapp text-[13px]"></i>
