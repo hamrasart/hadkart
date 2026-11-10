@@ -161,12 +161,12 @@
             <!-- TOP BANNERS (Touch Swipeable) -->
             <div id="topBannersWrapper" class="mb-10 space-y-4">
                 <div id="topMainBannerContainer" class="touch-pan-y">
-                    <div class="w-full h-48 md:h-72 rounded-2xl skeleton"></div>
+                    <div class="w-full aspect-[21/9] rounded-2xl skeleton"></div>
                 </div>
                 <div id="topSlimBannerContainer" class="touch-pan-y">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="w-full h-28 md:h-40 rounded-2xl skeleton"></div>
-                        <div class="w-full h-28 md:h-40 rounded-2xl skeleton"></div>
+                        <div class="w-full aspect-[2/1] rounded-2xl skeleton"></div>
+                        <div class="w-full aspect-[2/1] rounded-2xl skeleton"></div>
                     </div>
                 </div>
             </div>
@@ -1070,7 +1070,7 @@
                 if (!topMain.length) { topMainEl.innerHTML = ''; return; }
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 const current = topMain[((topMainIdx % topMain.length) + topMain.length) % topMain.length];
-                topMainEl.innerHTML = buildSingleBannerCard(current, 'h-48 md:h-72', anim);
+                topMainEl.innerHTML = buildSingleBannerCard(current, 'aspect-[21/9]', anim);
             }
             renderTopMain();
             if (topMain.length > 1) {
@@ -1091,7 +1091,7 @@
                 if (!topSlim.length) { topSlimEl.innerHTML = ''; return; }
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 if (topSlim.length === 1) {
-                    topSlimEl.innerHTML = buildSingleBannerCard(topSlim[0], 'h-28 md:h-40', anim);
+                    topSlimEl.innerHTML = buildSingleBannerCard(topSlim[0], 'aspect-[2/1]', anim);
                     return;
                 }
                 const len = topSlim.length;
@@ -1099,8 +1099,8 @@
                 const rightB = topSlim[(((topSlimIdx + 1) % len) + len) % len];
                 topSlimEl.innerHTML = `
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${buildSingleBannerCard(leftB, 'h-28 md:h-40', anim)}
-                        ${buildSingleBannerCard(rightB, 'h-28 md:h-40', anim)}
+                        ${buildSingleBannerCard(leftB, 'aspect-[2/1]', anim)}
+                        ${buildSingleBannerCard(rightB, 'aspect-[2/1]', anim)}
                     </div>
                 `;
             }
@@ -1129,7 +1129,7 @@
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 const len = bottomMain.length;
                 const current = bottomMain[((bottomMainIdx % len) + len) % len];
-                bottomMainEl.innerHTML = buildSingleBannerCard(current, 'h-44 md:h-64', anim);
+                bottomMainEl.innerHTML = buildSingleBannerCard(current, 'aspect-[21/9]', anim);
             }
             renderBottomMain();
             if (bottomMain.length > 1) {
@@ -1150,7 +1150,7 @@
                 if (!bottomSlim.length) { bottomSlimEl.innerHTML = ''; return; }
                 const anim = dir < 0 ? 'banner-slide-prev' : 'banner-slide';
                 if (bottomSlim.length === 1) {
-                    bottomSlimEl.innerHTML = buildSingleBannerCard(bottomSlim[0], 'h-28 md:h-40', anim);
+                    bottomSlimEl.innerHTML = buildSingleBannerCard(bottomSlim[0], 'aspect-[2/1]', anim);
                     return;
                 }
                 const len = bottomSlim.length;
@@ -1158,8 +1158,8 @@
                 const rightB = bottomSlim[(((bottomSlimIdx + 1) % len) + len) % len];
                 bottomSlimEl.innerHTML = `
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${buildSingleBannerCard(leftB, 'h-28 md:h-40', anim)}
-                        ${buildSingleBannerCard(rightB, 'h-28 md:h-40', anim)}
+                        ${buildSingleBannerCard(leftB, 'aspect-[2/1]', anim)}
+                        ${buildSingleBannerCard(rightB, 'aspect-[2/1]', anim)}
                     </div>
                 `;
             }
