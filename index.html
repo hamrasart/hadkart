@@ -14,27 +14,29 @@
     <meta property="og:url" id="ogUrl" content="https://hadkart.com">
     <meta name="twitter:card" content="summary_large_image">
 
-    <!-- OPTIMIZATION: Preload critical assets for instant loading -->
+    <!-- OPTIMIZATION 1: Preconnect & DNS Prefetch to Google Servers for instant data fetching -->
+    <link rel="preconnect" href="https://script.google.com" crossorigin>
+    <link rel="dns-prefetch" href="https://script.google.com">
+    <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+    <link rel="dns-prefetch" href="https://script.googleusercontent.com">
+
+    <!-- OPTIMIZATION 2: Preload Critical Assets (Logo) -->
     <link rel="preload" as="image" href="logo.png">
     
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
     
-    <!-- Preconnect for Faster Loading -->
-    <link rel="preconnect" href="https://script.google.com">
-    <link rel="preconnect" href="https://script.googleusercontent.com">
-    
-    <!-- Tailwind CSS CDN (Kept as per user request to avoid extra files) -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- OPTIMIZATION: Asynchronous FontAwesome loading (Keeps design 100% same but prevents blocking page load) -->
+    <!-- OPTIMIZATION 3: Asynchronous FontAwesome loading (No render blocking) -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     
-    <!-- OPTIMIZATION: Deferred script loading to speed up initial render -->
+    <!-- OPTIMIZATION 4: Deferred Script Loading -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 
-    <!-- OPTIMIZATION: Meta Pixel Code Delayed (Loads after 3.5 seconds to speed up website opening) -->
+    <!-- OPTIMIZATION 5: Delayed Meta Pixel (Loads 3.5 seconds after page starts, keeps initial load super fast) -->
     <script>
         window.addEventListener('load', function() {
             setTimeout(function() {
@@ -51,13 +53,11 @@
             }, 3500); 
         });
     </script>
-    <!-- End Meta Pixel Code -->
 
     <!-- Custom Store Event Tracking -->
     <script>
         const META_PIXEL_ID = "2316930835708318"; 
         const GA_MEASUREMENT_ID = ""; 
-
         function trackStoreEvent(eventName, params = {}) {
             try {
                 if (typeof fbq === 'function' && META_PIXEL_ID) fbq('track', eventName, params);
@@ -91,15 +91,12 @@
         }
         .chat-bubble-anim { animation: chatPop 0.3s ease-out forwards; }
 
-        /* Logo Breathing Animation for Splash Loader */
         @keyframes breathe {
             0%, 100% { transform: scale(1); opacity: 0.9; filter: drop-shadow(0 4px 12px rgba(0, 113, 227, 0.15)); }
             50% { transform: scale(1.12); opacity: 1; filter: drop-shadow(0 8px 24px rgba(0, 113, 227, 0.35)); }
         }
         .logo-breathe { animation: breathe 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         .touch-pan-y { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-        
-        /* Added for Carousel Slider */
         .slider-track { will-change: transform; }
     </style>
 </head>
@@ -172,8 +169,7 @@
 
         <!-- STORE SECTION -->
         <div id="storeSection">
-            
-            <!-- TOP BANNERS (True Slide Carousels) -->
+            <!-- TOP BANNERS -->
             <div id="topBannersWrapper" class="mb-10 space-y-4">
                 <div id="topMainBannerContainer" class="touch-pan-y">
                     <div class="w-full aspect-[21/9] rounded-2xl skeleton"></div>
@@ -186,7 +182,7 @@
                 </div>
             </div>
 
-            <!-- Explore Products Header & Sort -->
+            <!-- Explore Header -->
             <div id="exploreHeader" class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b border-slate-200/60 pb-4">
                 <div>
                     <h1 class="text-3xl font-semibold tracking-tight text-[#1d1d1f]">Explore Products.</h1>
@@ -211,7 +207,7 @@
                 </span>
             </div>
 
-            <!-- Products & Ads Grid -->
+            <!-- Products Grid -->
             <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <div class="apple-card bg-white p-4 h-80 skeleton rounded-2xl"></div>
                 <div class="apple-card bg-white p-4 h-80 skeleton rounded-2xl"></div>
@@ -311,7 +307,6 @@
 
     <!-- Interactive Live WhatsApp Chat Widget -->
     <div id="floatingWaContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end transition-all duration-300">
-        <!-- Mini WhatsApp Chat Window -->
         <div id="whatsappPopupBox" class="bg-[#efeae2] rounded-2xl shadow-2xl border border-slate-200 mb-3 w-80 sm:w-84 overflow-hidden hidden transition-all duration-300 flex flex-col">
             <div class="bg-[#075e54] text-white p-3.5 flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
@@ -326,9 +321,7 @@
                 </div>
                 <button onclick="toggleWhatsappPopup()" class="text-white/80 hover:text-white text-base px-1"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <div id="waChatList" class="p-3.5 space-y-2.5 max-h-64 overflow-y-auto flex flex-col text-left"></div>
-
             <div class="p-3 bg-white border-t border-slate-200 space-y-2">
                 <a href="https://wa.me/917907383944?text=Hi%20hadkart,%20I%20need%20assistance%20with%20my%20architectural%20designs%20and%20orders." target="_blank" class="w-full bg-[#25d366] hover:bg-[#20bd5a] text-white py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition">
                     <i class="fa-brands fa-whatsapp text-base"></i> Reply on WhatsApp
@@ -338,7 +331,6 @@
                 </a>
             </div>
         </div>
-
         <button onclick="toggleWhatsappPopup()" class="relative bg-[#25d366] hover:bg-[#20bd5a] text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl transition hover:scale-105" title="Open Support Chat">
             <i class="fa-brands fa-whatsapp"></i>
             <span id="waUnreadBadge" class="absolute -top-1 -right-1 bg-[#ff3b30] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md border-2 border-white hidden">0</span>
@@ -373,7 +365,6 @@
             </div>
             <div id="cartItemsList" class="flex-1 overflow-y-auto py-4 space-y-4 text-xs"></div>
             
-            <!-- Recommended Upsell inside Cart -->
             <div id="cartRecommendedSection" class="pt-3 border-t border-slate-100 hidden">
                 <h4 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">You Might Also Like</h4>
                 <div id="cartRecommendedList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
@@ -386,7 +377,6 @@
                 </div>
                 <div id="couponMessage" class="text-[11px]"></div>
 
-                <!-- Swipeable Available Coupons Section -->
                 <div id="availableCouponsWrapper" class="pt-1 hidden">
                     <div class="flex items-center justify-between mb-1.5">
                         <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-ticket text-[#0071e3] mr-1"></i>Available Offers (Swipe)</span>
@@ -426,7 +416,6 @@
                     <textarea id="checkoutAddress" rows="3" placeholder="House Name, Post, District, PIN Code" class="w-full px-3 py-2 bg-[#f5f5f7] border-0 rounded-xl focus:ring-1 focus:ring-[#0071e3]"></textarea>
                 </div>
 
-                <!-- Recommended Add-ons in Checkout -->
                 <div id="checkoutRecommendedSection" class="pt-3 border-t border-slate-100 hidden">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Recommended Add-ons</span>
@@ -435,7 +424,6 @@
                     <div id="checkoutRecommendedList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
                 </div>
 
-                <!-- Verified Payment & Security Badges -->
                 <div class="bg-[#f5f5f7] p-3 rounded-2xl border border-slate-200/60 space-y-2">
                     <div class="flex items-center justify-center gap-2 text-[11px] text-[#1d1d1f] font-semibold">
                         <i class="fa-solid fa-shield-halved text-[#34c759] text-sm"></i>
@@ -462,13 +450,11 @@
         <div class="bg-white max-w-sm w-full p-6 rounded-3xl shadow-2xl relative">
             <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
             
-            <!-- Auth Navigation Tabs -->
             <div id="authTabsHeader" class="flex gap-5 mb-5 border-b border-slate-100">
                 <button type="button" id="tabSignInBtn" onclick="switchAuthTab('signin')" class="pb-2.5 text-sm font-semibold text-[#0071e3] border-b-2 border-[#0071e3] transition">Sign In</button>
                 <button type="button" id="tabSignUpBtn" onclick="switchAuthTab('signup')" class="pb-2.5 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition">Create Account</button>
             </div>
 
-            <!-- 1. Sign In Form -->
             <form id="signInForm" onsubmit="handleLogin(event)" class="space-y-4 text-xs">
                 <p class="text-slate-500 text-[11px] -mt-2 mb-2">Sign in with your email and password to view your orders & access links.</p>
                 <div>
@@ -486,7 +472,6 @@
                 <button type="submit" id="signInSubmitBtn" class="w-full bg-[#1d1d1f] text-white hover:bg-black py-3 rounded-full font-medium transition">Sign In</button>
             </form>
 
-            <!-- 2. Sign Up Form -->
             <form id="signUpForm" onsubmit="handleSignup(event)" class="space-y-3.5 text-xs hidden">
                 <p class="text-slate-500 text-[11px] -mt-2 mb-2">Create a free hadkart account for faster checkout and instant order tracking.</p>
                 <div>
@@ -509,7 +494,6 @@
                 <button type="submit" id="signUpSubmitBtn" class="w-full apple-btn py-3 font-medium transition shadow-sm">Create Account</button>
             </form>
 
-            <!-- 3. Forgot Password Form -->
             <form id="forgotPwdForm" onsubmit="handleForgotPassword(event)" class="space-y-4 text-xs hidden">
                 <div>
                     <h3 class="text-base font-semibold text-[#1d1d1f] mb-1">Recover Password</h3>
@@ -576,6 +560,11 @@
         const RAZORPAY_LIVE_KEY = "rzp_live_3crrlxJYnfWJo9"; 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzewUuTZVNQwWDrEk0xqOuxC84OaUahGgYvsPysdsuYT5Hoe-60VBVqD1YtPFpkREbjyQ/exec";
         
+        // OPTIMIZATION 6: Start fetching data IMMEDIATELY, do not wait for HTML to finish drawing
+        const storeDataFetchPromise = fetch(SCRIPT_URL + "?action=getStoreData&t=" + Date.now())
+            .then(res => res.json())
+            .catch(err => { console.error("Error fetching data:", err); return null; });
+
         const DEFAULT_SHEET_COUPONS = [
             { 'Coupon Code': 'WELCOME20', 'Discount Type': 'Fixed', 'Discount Value': 20, 'Minimum Order Amount': 100, 'Status': 'Active' }
         ];
@@ -591,7 +580,7 @@
         let currentSort = "default";
         let searchQuery = "";
         let currentPage = 1;
-        const ITEMS_PER_PAGE = 24; // Kept at 24 as requested
+        const ITEMS_PER_PAGE = 24; 
         let appliedCouponCode = "";
         let discountAmount = 0;
         let currentActiveProductId = null;
@@ -604,6 +593,7 @@
             localStorage.setItem('hadkart_cart', JSON.stringify(cart));
         }
 
+        // OPTIMIZATION 7: Hide Loader Instantly (Removed the artificial 3.5s timeout)
         function hidePageLoader() {
             const loader = document.getElementById('pageLoader');
             if (loader && !loader.classList.contains('opacity-0')) {
@@ -796,7 +786,7 @@
             }, 300);
         }
 
-        // OPTIMIZATION: Video Facade to speed up rendering without loading heavy iframes initially
+        // OPTIMIZATION 8: Video Facade (YouTube doesn't slow down the page until clicked)
         function renderMediaSlideElement(url, title) {
             if (!url) return `<img src="https://via.placeholder.com/400x400?text=hadkart" class="aspect-square w-full object-cover rounded-xl">`;
             const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
@@ -854,22 +844,7 @@
             }
         });
 
-        window.addEventListener('DOMContentLoaded', () => {
-            updateCartUI();
-            updateNavAccountButton();
-            loadCachedStoreData();
-            fetchStoreData();
-            updateWishlistBadge();
-            initWhatsAppSequence();
-            window.addEventListener('hashchange', checkUrlHash);
-            setTimeout(hidePageLoader, 3500);
-
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-            });
-        });
-
+        // OPTIMIZATION 9: Cache-First Direct Product Loading (Deep Linking)
         function loadCachedStoreData() {
             try {
                 const cached = localStorage.getItem('hadkart_store_cache_v3');
@@ -879,49 +854,83 @@
                         allProducts = parsed.products;
                         allBanners = parsed.banners || [];
                         allAds = parsed.ads || []; 
-                        if (parsed.coupons && parsed.coupons.length) {
-                            allCoupons = parsed.coupons;
-                        }
-                        renderProducts();
-                        renderBanners();
-                        updateCartUI();
-                        checkUrlHash();
-                        setTimeout(hidePageLoader, 450);
+                        if (parsed.coupons && parsed.coupons.length) allCoupons = parsed.coupons;
+                        return true;
                     }
                 }
             } catch (e) {
                 console.warn("Cache read error:", e);
             }
+            return false;
         }
 
-        async function fetchStoreData() {
-            try {
-                const res = await fetch(SCRIPT_URL + "?action=getStoreData&t=" + Date.now());
-                const data = await res.json();
-                if (data.status === "success") {
+        // Handles loading logic independent of DOMContentLoaded so we can render 0-second deep links
+        function handleInitialLoad() {
+            const hasCache = loadCachedStoreData();
+            const hash = window.location.hash;
+            
+            // If Cache exists, render immediately
+            if (hasCache) {
+                if (hash.startsWith('#product=')) {
+                    const prodId = hash.replace('#product=', '');
+                    viewProductDetail(prodId, false); // Renders ONLY the product (Super fast!)
+                } else {
+                    showSection('store', false); // Renders home page normally
+                }
+                updateCartUI();
+                hidePageLoader(); // Zero-second Hide!
+            }
+            
+            // Process the fresh data fetched in background
+            storeDataFetchPromise.then(data => {
+                if (data && data.status === "success") {
                     allProducts = (data.products || []).filter(p => p['Product ID'] || p['Product Name']);
                     allBanners = data.banners || [];
                     allAds = data.ads || []; 
-                    if (Array.isArray(data.coupons)) {
-                        allCoupons = data.coupons;
-                    }
+                    if (Array.isArray(data.coupons)) allCoupons = data.coupons;
+                    
                     localStorage.setItem('hadkart_store_cache_v3', JSON.stringify({
-                        products: allProducts,
-                        banners: allBanners,
-                        coupons: allCoupons,
-                        ads: allAds
+                        products: allProducts, banners: allBanners, coupons: allCoupons, ads: allAds
                     }));
-                    renderBanners();
-                    renderProducts();
-                    updateCartUI();
-                    checkUrlHash();
-                    hidePageLoader();
+                    
+                    if (!hasCache) {
+                        // If no cache, render for the first time now
+                        if (hash.startsWith('#product=')) {
+                            const prodId = hash.replace('#product=', '');
+                            viewProductDetail(prodId, false);
+                        } else {
+                            showSection('store', false);
+                        }
+                        updateCartUI();
+                        hidePageLoader();
+                    } else {
+                        // Quietly update UI in background if user is currently on the store page
+                        if (!hash || hash === '#store') {
+                            renderBanners();
+                            renderProducts();
+                        }
+                    }
+                } else {
+                    if(!hasCache) hidePageLoader(); // Hide anyway to prevent stuck loader
                 }
-            } catch (err) {
-                console.error("Error loading store data:", err);
-                hidePageLoader();
-            }
+            });
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateNavAccountButton();
+            initWhatsAppSequence();
+            updateWishlistBadge();
+            
+            // Trigger Route handling
+            handleInitialLoad();
+            
+            window.addEventListener('hashchange', checkUrlHash);
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+            });
+        });
 
         function attachSwipeGesture(el, itemCount, onSwipeDirection) {
             el._swipeCallback = onSwipeDirection;
@@ -1195,7 +1204,7 @@
             renderProducts();
         }
 
-        // OPTIMIZATION: Debounce search to prevent UI freezing
+        // OPTIMIZATION 10: Debounce search to prevent UI freezing
         let searchDebounceTimer = null;
         function handleSearch(val, suggestionBoxId) {
             clearTimeout(searchDebounceTimer);
@@ -1254,7 +1263,7 @@
             viewProductDetail(prodId);
         }
 
-        // OPTIMIZATION: Using DocumentFragment to double rendering speed
+        // OPTIMIZATION 11: DocumentFragment used to double product rendering speed
         function renderProducts() {
             const grid = document.getElementById('productsGrid');
             let filtered = allProducts.filter(p => {
@@ -1444,6 +1453,7 @@
             if (recentlyViewed.length > 10) recentlyViewed.pop();
             localStorage.setItem('hadkart_recent', JSON.stringify(recentlyViewed));
 
+            // Show Product, Hide Everything Else (Super fast rendering!)
             document.getElementById('storeSection').classList.add('hidden');
             document.getElementById('accountSection').classList.add('hidden');
             document.getElementById('legalSection').classList.add('hidden');
@@ -1659,6 +1669,7 @@
                 document.getElementById('storeSection').classList.remove('hidden');
                 if (updateHash) window.location.hash = 'store';
                 updateDynamicMetaTags("hadkart - Digital, Physical & Service Store", "Professional architectural designs, digital guides, and lifestyle products.", "https://hadkart.com/logo.png");
+                renderBanners(); 
                 renderProducts();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1962,7 +1973,7 @@
             renderRecommendedInModals();
         }
 
-        // OPTIMIZATION: Dynamically loading Razorpay only when Checkout is opened
+        // OPTIMIZATION 12: Dynamically load Razorpay ONLY when user clicks Checkout
         function proceedToCheckout() {
             if (!cart.length) return;
             
@@ -1986,7 +1997,7 @@
             const btn = document.getElementById('payButton');
 
             if (typeof Razorpay === 'undefined') {
-                alert("Secure payment gateway is loading. Please click 'Pay Now' again in 2 seconds.");
+                alert("Secure payment gateway is loading. Please click 'Pay Now' again in a few seconds.");
                 return;
             }
 
