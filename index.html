@@ -19,6 +19,7 @@
     <link rel="dns-prefetch" href="https://script.google.com">
     <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
     <link rel="dns-prefetch" href="https://script.googleusercontent.com">
+    <link rel="preconnect" href="https://wsrv.nl" crossorigin> <!-- Added Image CDN Preconnect -->
 
     <!-- OPTIMIZATION 2: Preload Critical Assets (Logo) -->
     <link rel="preload" as="image" href="logo.png">
@@ -26,7 +27,7 @@
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
     
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS CDN (Kept intact to guarantee 100% design match) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- OPTIMIZATION 3: Asynchronous FontAwesome loading (No render blocking) -->
@@ -98,6 +99,9 @@
         .logo-breathe { animation: breathe 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         .touch-pan-y { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
         .slider-track { will-change: transform; }
+        
+        /* Speed Optimization: Hides non-visible cards */
+        .content-visibility-auto { content-visibility: auto; contain-intrinsic-size: 320px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased pb-16 md:pb-0">
@@ -560,7 +564,7 @@
         const RAZORPAY_LIVE_KEY = "rzp_live_3crrlxJYnfWJo9"; 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzewUuTZVNQwWDrEk0xqOuxC84OaUahGgYvsPysdsuYT5Hoe-60VBVqD1YtPFpkREbjyQ/exec";
         
-        // OPTIMIZATION 6: Start fetching data IMMEDIATELY, do not wait for HTML to finish drawing
+        // OPTIMIZATION 6: Start fetching data IMMEDIATELY
         const storeDataFetchPromise = fetch(SCRIPT_URL + "?action=getStoreData&t=" + Date.now())
             .then(res => res.json())
             .catch(err => { console.error("Error fetching data:", err); return null; });
@@ -593,7 +597,7 @@
             localStorage.setItem('hadkart_cart', JSON.stringify(cart));
         }
 
-        // OPTIMIZATION 7: Hide Loader Instantly (Removed the artificial 3.5s timeout)
+        // OPTIMIZATION 7: Hide Loader Instantly
         function hidePageLoader() {
             const loader = document.getElementById('pageLoader');
             if (loader && !loader.classList.contains('opacity-0')) {
@@ -744,6 +748,15 @@
             return list.length ? list : ['https://via.placeholder.com/400x300?text=hadkart'];
         }
 
+        // OPTIMIZATION 8: IMAGE CDN PROXY (Automatically compresses big images to WebP)
+        function optimizeImageUrl(url, width = 600) {
+            if (!url) return 'https://via.placeholder.com/400x300?text=hadkart';
+            if (url.includes('via.placeholder.com')) return url; 
+            if (isVideoUrl(url)) return url; 
+            if (url.includes('wsrv.nl')) return url;
+            return `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=webp&w=${width}&q=80`;
+        }
+
         function getFirstImage(p) {
             const list = getAllMediaUrls(p);
             for (const url of list) {
@@ -786,7 +799,7 @@
             }, 300);
         }
 
-        // OPTIMIZATION 8: Video Facade (YouTube doesn't slow down the page until clicked)
+        // OPTIMIZATION 9: Video Facade
         function renderMediaSlideElement(url, title) {
             if (!url) return `<img src="https://via.placeholder.com/400x400?text=hadkart" class="aspect-square w-full object-cover rounded-xl">`;
             const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
@@ -807,7 +820,7 @@
             if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) {
                 return `<video src="${url}" controls playsinline class="aspect-square w-full rounded-xl bg-black object-contain"></video>`;
             }
-            return `<img src="${url}" alt="${title}" onclick="openLightbox('${url}')" class="aspect-square w-full object-cover rounded-xl cursor-zoom-in hover:opacity-95 transition">`;
+            return `<img src="${optimizeImageUrl(url, 800)}" alt="${title}" onclick="openLightbox('${url}')" class="aspect-square w-full object-cover rounded-xl cursor-zoom-in hover:opacity-95 transition">`;
         }
 
         function getProductTagsArray(p) {
@@ -844,7 +857,7 @@
             }
         });
 
-        // OPTIMIZATION 9: Cache-First Direct Product Loading (Deep Linking)
+        // OPTIMIZATION 10: Cache-First Direct Product Loading (Deep Linking - 0 Seconds)
         function loadCachedStoreData() {
             try {
                 const cached = localStorage.getItem('hadkart_store_cache_v3');
@@ -864,24 +877,21 @@
             return false;
         }
 
-        // Handles loading logic independent of DOMContentLoaded so we can render 0-second deep links
         function handleInitialLoad() {
             const hasCache = loadCachedStoreData();
             const hash = window.location.hash;
             
-            // If Cache exists, render immediately
             if (hasCache) {
                 if (hash.startsWith('#product=')) {
                     const prodId = hash.replace('#product=', '');
-                    viewProductDetail(prodId, false); // Renders ONLY the product (Super fast!)
+                    viewProductDetail(prodId, false);
                 } else {
-                    showSection('store', false); // Renders home page normally
+                    showSection('store', false); 
                 }
                 updateCartUI();
-                hidePageLoader(); // Zero-second Hide!
+                hidePageLoader(); 
             }
             
-            // Process the fresh data fetched in background
             storeDataFetchPromise.then(data => {
                 if (data && data.status === "success") {
                     allProducts = (data.products || []).filter(p => p['Product ID'] || p['Product Name']);
@@ -894,7 +904,6 @@
                     }));
                     
                     if (!hasCache) {
-                        // If no cache, render for the first time now
                         if (hash.startsWith('#product=')) {
                             const prodId = hash.replace('#product=', '');
                             viewProductDetail(prodId, false);
@@ -904,14 +913,13 @@
                         updateCartUI();
                         hidePageLoader();
                     } else {
-                        // Quietly update UI in background if user is currently on the store page
                         if (!hash || hash === '#store') {
                             renderBanners();
                             renderProducts();
                         }
                     }
                 } else {
-                    if(!hasCache) hidePageLoader(); // Hide anyway to prevent stuck loader
+                    if(!hasCache) hidePageLoader();
                 }
             });
         }
@@ -921,7 +929,6 @@
             initWhatsAppSequence();
             updateWishlistBadge();
             
-            // Trigger Route handling
             handleInitialLoad();
             
             window.addEventListener('hashchange', checkUrlHash);
@@ -979,7 +986,8 @@
 
         function buildSingleBannerCard(b, heightClass, withLink = true) {
             if (!b) return '';
-            const img = b['Image URL'] || b['Image URLs'] || '';
+            const rawImg = b['Image URL'] || b['Image URLs'] || '';
+            const img = optimizeImageUrl(rawImg, 1000);
             const title = b['Banner Title'] || b['Title'] || 'Featured Banner';
             const link = getBannerLink(b);
             
@@ -1204,7 +1212,7 @@
             renderProducts();
         }
 
-        // OPTIMIZATION 10: Debounce search to prevent UI freezing
+        // OPTIMIZATION 11: Debounce search
         let searchDebounceTimer = null;
         function handleSearch(val, suggestionBoxId) {
             clearTimeout(searchDebounceTimer);
@@ -1241,10 +1249,11 @@
             box.innerHTML = matches.map(p => {
                 const price = parsePrice(p['Sale Price']);
                 const pid = p['Product ID'];
+                const img = optimizeImageUrl(getFirstImage(p), 150);
                 return `
                     <div onclick="selectSearchSuggestion('${pid}', '${boxId}')" class="flex items-center justify-between gap-3 p-2.5 hover:bg-[#f5f5f7] cursor-pointer border-b border-slate-100 last:border-0 transition">
                         <div class="flex items-center gap-2.5 overflow-hidden">
-                            <img src="${getFirstImage(p)}" class="w-9 h-9 rounded-lg object-cover shrink-0">
+                            <img src="${img}" class="w-9 h-9 rounded-lg object-cover shrink-0">
                             <div class="overflow-hidden">
                                 <div class="text-xs font-semibold text-[#1d1d1f] truncate">${p['Product Name']}</div>
                                 <div class="text-[10px] text-slate-400 truncate">${p['Product Type'] || 'Product'}</div>
@@ -1263,7 +1272,7 @@
             viewProductDetail(prodId);
         }
 
-        // OPTIMIZATION 11: DocumentFragment used to double product rendering speed
+        // OPTIMIZATION 12: DocumentFragment & content-visibility
         function renderProducts() {
             const grid = document.getElementById('productsGrid');
             let filtered = allProducts.filter(p => {
@@ -1302,13 +1311,13 @@
                 const badgeColor = getBadgeColorClass(p);
                 const salePrice = parsePrice(p['Sale Price']);
                 const regPrice = parsePrice(p['Regular Price']);
-                const imgUrl = getFirstImage(p);
+                const imgUrl = optimizeImageUrl(getFirstImage(p), 500); 
                 const descText = getDesc(p);
                 const prodTags = getProductTagsArray(p);
                 const hasVideo = getAllMediaUrls(p).some(u => isVideoUrl(u));
 
                 const cardContainer = document.createElement('div');
-                cardContainer.className = "apple-card overflow-hidden flex flex-col justify-between group cursor-pointer";
+                cardContainer.className = "apple-card content-visibility-auto overflow-hidden flex flex-col justify-between group cursor-pointer";
                 cardContainer.onclick = () => viewProductDetail(prodId);
                 
                 cardContainer.innerHTML = `
@@ -1355,10 +1364,10 @@
                 if ((index + 1) % 5 === 0 && allAds.length > 0) {
                     const ad = allAds[adCounter % allAds.length];
                     const adLink = ad['Redirect URL'] || '#';
-                    const adImg = ad['Image URL'];
+                    const adImg = optimizeImageUrl(ad['Image URL'], 500);
                     
                     const adCard = document.createElement('div');
-                    adCard.className = "apple-card overflow-hidden flex flex-col group relative bg-slate-100 cursor-pointer shadow-sm border border-slate-200/60";
+                    adCard.className = "apple-card content-visibility-auto overflow-hidden flex flex-col group relative bg-slate-100 cursor-pointer shadow-sm border border-slate-200/60";
                     adCard.onclick = () => { if(adLink !== '#') window.location.href = adLink; };
                     adCard.innerHTML = `
                         <div class="relative overflow-hidden w-full flex-1 bg-slate-200">
@@ -1439,7 +1448,7 @@
             const badgeColor = getBadgeColorClass(product);
             const salePrice = parsePrice(product['Sale Price']);
             const regPrice = parsePrice(product['Regular Price']);
-            const imgUrl = getFirstImage(product);
+            const imgUrl = optimizeImageUrl(getFirstImage(product), 800);
             const descText = getDesc(product) || 'No description available.';
             const prodTags = getProductTagsArray(product);
             currentDetailMediaList = getAllMediaUrls(product);
@@ -1453,7 +1462,6 @@
             if (recentlyViewed.length > 10) recentlyViewed.pop();
             localStorage.setItem('hadkart_recent', JSON.stringify(recentlyViewed));
 
-            // Show Product, Hide Everything Else (Super fast rendering!)
             document.getElementById('storeSection').classList.add('hidden');
             document.getElementById('accountSection').classList.add('hidden');
             document.getElementById('legalSection').classList.add('hidden');
@@ -1488,7 +1496,7 @@
                         <div class="flex items-center gap-3 mt-4 overflow-x-auto no-scrollbar pb-2">
                             ${currentDetailMediaList.map((mUrl, idx) => `
                                 <div onclick="setDetailMediaSlide(${idx})" class="thumbnail-item relative w-16 h-16 shrink-0 rounded-lg cursor-pointer border-2 ${idx === 0 ? 'border-[#0071e3] opacity-100' : 'border-transparent opacity-60 hover:opacity-100'} transition-all overflow-hidden bg-slate-100">
-                                    <img src="${getThumbUrl(mUrl)}" class="w-full h-full object-cover">
+                                    <img src="${optimizeImageUrl(getThumbUrl(mUrl), 150)}" class="w-full h-full object-cover">
                                     ${isVideoUrl(mUrl) ? `<div class="absolute inset-0 bg-black/30 flex items-center justify-center"><i class="fa-solid fa-play text-white text-xs"></i></div>` : ''}
                                 </div>
                             `).join('')}
@@ -1554,10 +1562,11 @@
                     const pSale = parsePrice(p['Sale Price']);
                     const pBadge = getBadgeText(p);
                     const pBadgeColor = getBadgeColorClass(p);
+                    const pImg = optimizeImageUrl(getFirstImage(p), 300);
                     return `
                         <div onclick="viewProductDetail('${p['Product ID']}')" class="apple-card bg-white p-3.5 cursor-pointer min-w-[200px] max-w-[200px] flex-shrink-0 flex flex-col justify-between relative">
                             <div class="relative h-32 bg-slate-100 rounded-xl overflow-hidden mb-3">
-                                <img src="${getFirstImage(p)}" class="w-full h-full object-cover" loading="lazy">
+                                <img src="${pImg}" class="w-full h-full object-cover" loading="lazy">
                                 ${pBadge ? `<span class="absolute top-2 left-2 ${pBadgeColor} text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase">${pBadge}</span>` : ''}
                             </div>
                             <div>
@@ -1586,9 +1595,10 @@
             container.classList.remove('hidden');
             grid.innerHTML = filteredRecent.map(p => {
                 const pSale = parsePrice(p['Sale Price']);
+                const pImg = optimizeImageUrl(getFirstImage(p), 300);
                 return `
                     <div onclick="viewProductDetail('${p['Product ID']}')" class="apple-card bg-white p-3.5 cursor-pointer min-w-[190px] max-w-[190px] flex-shrink-0 flex flex-col justify-between">
-                        <img src="${getFirstImage(p)}" class="w-full aspect-square object-cover rounded-xl mb-2.5" loading="lazy">
+                        <img src="${pImg}" class="w-full aspect-square object-cover rounded-xl mb-2.5" loading="lazy">
                         <div>
                             <h4 class="font-semibold text-xs text-[#1d1d1f] line-clamp-1">${p['Product Name']}</h4>
                             <div class="text-xs font-semibold text-slate-600 mt-0.5">₹${pSale.toLocaleString('en-IN')}</div>
@@ -1632,9 +1642,10 @@
             }
             grid.innerHTML = wishItems.map(p => {
                 const salePrice = parsePrice(p['Sale Price']);
+                const img = optimizeImageUrl(getFirstImage(p), 300);
                 return `
                     <div class="apple-card overflow-hidden flex flex-col justify-between p-4 bg-white">
-                        <img src="${getFirstImage(p)}" onclick="viewProductDetail('${p['Product ID']}')" class="w-full aspect-square object-cover rounded-xl mb-3 cursor-pointer" loading="lazy">
+                        <img src="${img}" onclick="viewProductDetail('${p['Product ID']}')" class="w-full aspect-square object-cover rounded-xl mb-3 cursor-pointer" loading="lazy">
                         <h3 class="font-semibold text-[#1d1d1f] text-xs line-clamp-1">${p['Product Name']}</h3>
                         <div class="text-xs font-semibold text-[#1d1d1f] mt-1">₹${salePrice.toLocaleString('en-IN')}</div>
                         <div class="grid grid-cols-2 gap-2 mt-3">
@@ -1792,10 +1803,11 @@
             const cardsHtml = availableRecs.map(p => {
                 const price = parsePrice(p['Sale Price']);
                 const pid = p['Product ID'];
+                const img = optimizeImageUrl(getFirstImage(p), 150);
                 return `
                     <div class="min-w-[135px] max-w-[135px] bg-[#f5f5f7] p-2 rounded-xl flex flex-col justify-between shrink-0 border border-slate-200/60">
                         <div class="flex items-center gap-2 mb-1.5">
-                            <img src="${getFirstImage(p)}" class="w-9 h-9 rounded-lg object-cover shrink-0">
+                            <img src="${img}" class="w-9 h-9 rounded-lg object-cover shrink-0">
                             <div class="overflow-hidden">
                                 <h5 class="text-[10px] font-semibold text-[#1d1d1f] truncate">${p['Product Name']}</h5>
                                 <div class="text-[10px] font-bold text-[#0071e3]">₹${price.toLocaleString('en-IN')}</div>
@@ -1834,9 +1846,10 @@
             }
             list.innerHTML = cart.map(item => {
                 const itemPrice = parsePrice(item['Sale Price']);
+                const img = optimizeImageUrl(getFirstImage(item), 150);
                 return `
                     <div class="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                        <img src="${getFirstImage(item)}" class="w-12 h-12 object-cover rounded-lg" loading="lazy">
+                        <img src="${img}" class="w-12 h-12 object-cover rounded-lg" loading="lazy">
                         <div class="flex-1">
                             <h4 class="font-semibold text-[#1d1d1f] line-clamp-1">${item['Product Name']}</h4>
                             <div class="text-slate-500">₹${itemPrice.toLocaleString('en-IN')} x ${item.qty}</div>
