@@ -6,7 +6,7 @@
     <title>hadkart - Digital, Physical & Service Store</title>
     <meta name="description" content="Browse digital architectural publications, 2D/3D home plans, construction guides, and expert design consultation services by hadkart.">
     
-    <!-- Tailwind CSS CDN (Apple Style UI Support) -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Dynamic OpenGraph / Social Share Meta Tags -->
@@ -35,34 +35,6 @@
     
     <!-- Deferred Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
-
-    <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                !function(f,b,e,v,n,t,s)
-                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;
-                t.src=v;s=b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t,s)}(window, document,'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-                fbq('init', '2316930835708318');
-                fbq('track', 'PageView');
-            }, 3500); 
-        });
-    </script>
-
-    <script>
-        const META_PIXEL_ID = "2316930835708318"; 
-        const GA_MEASUREMENT_ID = ""; 
-        function trackStoreEvent(eventName, params = {}) {
-            try {
-                if (typeof fbq === 'function' && META_PIXEL_ID) fbq('track', eventName, params);
-                if (typeof gtag === 'function' && GA_MEASUREMENT_ID) gtag('event', eventName, params);
-            } catch (e) {}
-        }
-    </script>
 
     <style>
         body { background-color: #f5f5f7; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
@@ -100,19 +72,6 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased pb-16 md:pb-0">
-
-    <!-- Initial Breathing Logo Loading Overlay -->
-    <div id="pageLoader" class="fixed inset-0 z-[100] bg-[#f5f5f7] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="relative flex flex-col items-center">
-            <img src="logo.png" onerror="this.src='https://via.placeholder.com/80/0071e3/ffffff?text=H'" alt="hadkart loading" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover logo-breathe">
-            <span class="mt-4 text-sm font-semibold tracking-tight text-[#1d1d1f] lowercase">hadkart</span>
-            <div class="mt-2 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 0ms;"></span>
-                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 150ms;"></span>
-                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 300ms;"></span>
-            </div>
-        </div>
-    </div>
 
     <!-- Top Contact Banner -->
     <div class="bg-[#1d1d1f] text-[#f5f5f7] text-xs py-2 px-4 text-center font-normal flex flex-col sm:flex-row items-center justify-center gap-2 md:sticky md:top-0 md:z-50">
@@ -895,20 +854,10 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // Optimized initial loading to instantly remove loader
         function handleInitialLoad() {
             const hasCache = loadCachedStoreData();
             const hash = window.location.hash;
-            
-            if (hasCache) {
-                if (hash.startsWith('#product=')) {
-                    const prodId = hash.replace('#product=', '');
-                    viewProductDetail(prodId, false);
-                } else {
-                    showSection('store', false); 
-                }
-                updateCartUI();
-                hidePageLoader(); 
-            }
             
             storeDataFetchPromise.then(data => {
                 if (data && (data.status === "success" || data.products)) {
@@ -920,28 +869,25 @@
                     localStorage.setItem('hadkart_store_cache_v3', JSON.stringify({
                         products: allProducts, banners: allBanners, coupons: allCoupons, ads: allAds
                     }));
-                    
-                    if (!hasCache) {
-                        if (hash.startsWith('#product=')) {
-                            const prodId = hash.replace('#product=', '');
-                            viewProductDetail(prodId, false);
-                        } else {
-                            showSection('store', false);
-                        }
-                        updateCartUI();
-                        hidePageLoader();
-                    } else {
-                        if (!hash || hash === '#store') {
-                            renderBanners();
-                            renderProducts();
-                            isStoreRendered = true;
-                        } else {
-                            isStoreRendered = false;
-                        }
-                    }
-                } else {
-                    if(!hasCache) hidePageLoader();
                 }
+
+                if (hash.startsWith('#product=')) {
+                    const prodId = hash.replace('#product=', '');
+                    viewProductDetail(prodId, false);
+                } else {
+                    showSection('store', false);
+                }
+                updateCartUI();
+                hidePageLoader();
+            }).catch(() => {
+                loadCachedStoreData();
+                if (hash.startsWith('#product=')) {
+                    viewProductDetail(hash.replace('#product=', ''), false);
+                } else {
+                    showSection('store', false);
+                }
+                updateCartUI();
+                hidePageLoader();
             });
         }
 
