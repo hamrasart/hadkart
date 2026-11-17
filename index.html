@@ -73,6 +73,19 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased pb-16 md:pb-0">
 
+    <!-- Initial Breathing Logo Loading Overlay -->
+    <div id="pageLoader" class="fixed inset-0 z-[100] bg-[#f5f5f7] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative flex flex-col items-center">
+            <img src="logo.png" onerror="this.src='https://via.placeholder.com/80/0071e3/ffffff?text=H'" alt="hadkart loading" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover logo-breathe">
+            <span class="mt-4 text-sm font-semibold tracking-tight text-[#1d1d1f] lowercase">hadkart</span>
+            <div class="mt-2 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 0ms;"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 150ms;"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 300ms;"></span>
+            </div>
+        </div>
+    </div>
+
     <!-- Top Contact Banner -->
     <div class="bg-[#1d1d1f] text-[#f5f5f7] text-xs py-2 px-4 text-center font-normal flex flex-col sm:flex-row items-center justify-center gap-2 md:sticky md:top-0 md:z-50">
         <span class="font-light">Looking for 3D plans, Home design or Construction works?</span>
@@ -126,7 +139,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
 
         <!-- STORE SECTION -->
-        <div id="storeSection">
+        <div id="storeSection" class="hidden">
             <!-- TOP BANNERS -->
             <div id="topBannersWrapper" class="mb-10 space-y-4">
                 <div id="topMainBannerContainer" class="touch-pan-y">
@@ -854,7 +867,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Optimized initial loading to instantly remove loader
         function handleInitialLoad() {
             const hasCache = loadCachedStoreData();
             const hash = window.location.hash;
@@ -2361,20 +2373,15 @@
                 html = `<p><strong>Digital Products & Services:</strong> Digital guides, e-books, and consultation packages are delivered instantly upon successful payment confirmation. Customers receive secure login credentials and access links directly via email and their account dashboard.</p>
                         <p><strong>Physical Products:</strong> Physical items (such as printed hardcopy checklists or books) are processed and dispatched via reliable courier services within 2 to 3 working days. Standard delivery timelines range from 5 to 7 business days depending on the shipping location within India.</p>`;
             } else if (type === 'refund') {
-                title = "Refund & Cancellation Policy";
+                title = "Retry & Refund Policy";
                 html = `<p><strong>No Refund Policy for Digital Goods:</strong> Due to the irrevocable nature of digital e-books, architectural publications, and online view-only media, <strong>all sales of digital products are final and non-refundable</strong> once access has been granted.</p>
                         <p><strong>Cancellations:</strong> Orders for digital products or customized services cannot be cancelled once payment is processed and account access is provisioned.</p>
                         <p><strong>Damaged Physical Goods:</strong> If you receive a physical product that is physically damaged or defective, you may report it to us within 48 hours of delivery along with photographic evidence, and we will arrange a replacement after verification.</p>`;
             } else if (type === 'contact') {
                 title = "Contact Us";
-                html = `<p>If you have any questions, concerns, or require assistance regarding our policies, products, or orders, please feel free to reach out to us:</p>
-                        <p><strong>Business Name:</strong> hadkart (HAD Architecture & Interiors)<br>
-                        <strong>Location:</strong> Tirur, Malappuram District, Kerala, India - 676101<br>
-                        <strong>Phone / WhatsApp:</strong> +91 7907383944<br>
-                        <strong>Email:</strong> info@hadkart.com</p>`;
+                html = `<p>Get in touch with us for queries or architectural support.</p>`;
             }
-            content.innerHTML = `<h2 class="text-2xl font-semibold text-[#1d1d1f] mb-4">${title}</h2><div class="text-slate-600 text-xs leading-relaxed space-y-3">${html}</div>`;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            content.innerHTML = html;
         }
     </script>
 </body>
