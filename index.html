@@ -6,7 +6,7 @@
     <title>hadkart - Digital, Physical & Service Store</title>
     <meta name="description" content="Browse digital architectural publications, 2D/3D home plans, construction guides, and expert design consultation services by hadkart.">
     
-    <!-- Tailwind CSS CDN (Apple Style UI Support) -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Dynamic OpenGraph / Social Share Meta Tags -->
@@ -35,34 +35,6 @@
     
     <!-- Deferred Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
-
-    <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                !function(f,b,e,v,n,t,s)
-                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;
-                t.src=v;s=b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t,s)}(window, document,'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-                fbq('init', '2316930835708318');
-                fbq('track', 'PageView');
-            }, 3500); 
-        });
-    </script>
-
-    <script>
-        const META_PIXEL_ID = "2316930835708318"; 
-        const GA_MEASUREMENT_ID = ""; 
-        function trackStoreEvent(eventName, params = {}) {
-            try {
-                if (typeof fbq === 'function' && META_PIXEL_ID) fbq('track', eventName, params);
-                if (typeof gtag === 'function' && GA_MEASUREMENT_ID) gtag('event', eventName, params);
-            } catch (e) {}
-        }
-    </script>
 
     <style>
         body { background-color: #f5f5f7; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
@@ -167,7 +139,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
 
         <!-- STORE SECTION -->
-        <div id="storeSection">
+        <div id="storeSection" class="hidden">
             <!-- TOP BANNERS -->
             <div id="topBannersWrapper" class="mb-10 space-y-4">
                 <div id="topMainBannerContainer" class="touch-pan-y">
@@ -224,7 +196,7 @@
             </div>
         </div>
 
-        <!-- PRODUCT DETAILS VIEW -->
+        <!-- PRODUCT DETAILS VIEW (Fast Load on Direct Link) -->
         <div id="productDetailSection" class="hidden">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="showSection('store')" class="text-[#0071e3] hover:underline text-xs font-medium flex items-center gap-1.5">
@@ -554,12 +526,13 @@
         </div>
     </footer>
 
-    <!-- JavaScript Application Logic -->
+    <!-- JavaScript Application Logic with Smart Fast Product Loading -->
     <script>
         const RAZORPAY_LIVE_KEY = "rzp_live_3crrlxJYnfWJo9"; 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzewUuTZVNQwWDrEk0xqOuxC84OaUahGgYvsPysdsuYT5Hoe-60VBVqD1YtPFpkREbjyQ/exec";
         const DATA_URL = "data.json";
         
+        // Fast pre-fetch store data
         const storeDataFetchPromise = fetch(DATA_URL + "?t=" + Date.now())
             .then(res => res.json())
             .catch(err => { console.error("Error fetching data:", err); return null; });
@@ -895,20 +868,9 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // SMART LAZY LOAD INITIAL ROUTE (Ultra fast for direct product links)
         function handleInitialLoad() {
-            const hasCache = loadCachedStoreData();
             const hash = window.location.hash;
-            
-            if (hasCache) {
-                if (hash.startsWith('#product=')) {
-                    const prodId = hash.replace('#product=', '');
-                    viewProductDetail(prodId, false);
-                } else {
-                    showSection('store', false); 
-                }
-                updateCartUI();
-                hidePageLoader(); 
-            }
             
             storeDataFetchPromise.then(data => {
                 if (data && (data.status === "success" || data.products)) {
@@ -920,28 +882,18 @@
                     localStorage.setItem('hadkart_store_cache_v3', JSON.stringify({
                         products: allProducts, banners: allBanners, coupons: allCoupons, ads: allAds
                     }));
-                    
-                    if (!hasCache) {
-                        if (hash.startsWith('#product=')) {
-                            const prodId = hash.replace('#product=', '');
-                            viewProductDetail(prodId, false);
-                        } else {
-                            showSection('store', false);
-                        }
-                        updateCartUI();
-                        hidePageLoader();
-                    } else {
-                        if (!hash || hash === '#store') {
-                            renderBanners();
-                            renderProducts();
-                            isStoreRendered = true;
-                        } else {
-                            isStoreRendered = false;
-                        }
-                    }
                 } else {
-                    if(!hasCache) hidePageLoader();
+                    loadCachedStoreData();
                 }
+
+                if (hash.startsWith('#product=')) {
+                    const prodId = hash.replace('#product=', '');
+                    viewProductDetail(prodId, false);
+                } else {
+                    showSection('store', false);
+                }
+                updateCartUI();
+                hidePageLoader();
             });
         }
 
