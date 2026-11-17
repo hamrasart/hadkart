@@ -2428,39 +2428,5 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
-    
-    <!-- PWA Offline Cache Service Worker -->
-    <script>
-        const swCode = `
-            const CACHE_NAME = 'hadkart-v5-cache';
-            const urlsToCache = ['/', '/logo.png'];
-            self.addEventListener('install', event => {
-                self.skipWaiting();
-                event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache).catch(err=>console.log(err))));
-            });
-            self.addEventListener('fetch', event => {
-                if (event.request.method !== 'GET' || event.request.url.includes('script.google.com')) return;
-                event.respondWith(
-                    caches.match(event.request).then(response => {
-                        return response || fetch(event.request).then(fetchRes => {
-                            return caches.open(CACHE_NAME).then(cache => {
-                                if(event.request.url.startsWith('http')) cache.put(event.request, fetchRes.clone());
-                                return fetchRes;
-                            });
-                        });
-                    }).catch(() => caches.match('/'))
-                );
-            });
-        `;
-        try {
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register(swUrl).catch(err => console.log('SW setup skipped'));
-                });
-            }
-        } catch (e) {}
-    </script>
 </body>
 </html>
