@@ -370,7 +370,7 @@
             
             <div id="cartRecommendedSection" class="pt-3 border-t border-slate-100 hidden">
                 <h4 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">You Might Also Like</h4>
-                <div id="cartRecommendedList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
+                <div id="cartRecommendedList" class="grid grid-cols-2 gap-2 pb-2"></div>
             </div>
 
             <div class="border-t border-slate-100 pt-3 space-y-2.5">
@@ -382,9 +382,9 @@
 
                 <div id="availableCouponsWrapper" class="pt-1 hidden">
                     <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-ticket text-[#0071e3] mr-1"></i>Available Offers (Swipe)</span>
+                        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-ticket text-[#0071e3] mr-1"></i>Available Offers</span>
                     </div>
-                    <div id="availableCouponsList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1"></div>
+                    <div id="availableCouponsList" class="grid grid-cols-2 gap-2 pb-1"></div>
                 </div>
 
                 <div class="flex justify-between text-sm font-semibold text-[#1d1d1f] pt-1">
@@ -424,7 +424,7 @@
                         <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Recommended Add-ons</span>
                         <span id="checkoutTotalBadge" class="text-xs font-bold text-[#0071e3]"></span>
                     </div>
-                    <div id="checkoutRecommendedList" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2"></div>
+                    <div id="checkoutRecommendedList" class="grid grid-cols-2 gap-2 pb-2"></div>
                 </div>
 
                 <div class="bg-[#f5f5f7] p-3 rounded-2xl border border-slate-200/60 space-y-2">
@@ -561,19 +561,12 @@
     <!-- JavaScript Application Logic -->
     <script>
         const RAZORPAY_LIVE_KEY = "rzp_live_3crrlxJYnfWJo9"; 
-        
-        // --- 🚀 പുതുതായി ആഡ് ചെയ്ത ഭാഗം ---
-        // ലോഗിൻ ചെയ്യാനും ഓർഡർ കൊടുക്കാനും പഴയ ഗൂഗിൾ ഷീറ്റ് ലിങ്ക് തന്നെ വേണം:
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzewUuTZVNQwWDrEk0xqOuxC84OaUahGgYvsPysdsuYT5Hoe-60VBVqD1YtPFpkREbjyQ/exec";
-        
-        // പ്രൊഡക്റ്റുകൾ സ്ക്രീനിൽ കാണിക്കാൻ മാത്രം ഗിറ്റ്ഹബ്ബിലെ JSON ഫയൽ ഉപയോഗിക്കുന്നു (ഇതാണ് സ്പീഡ് കൂട്ടുന്നത്):
         const DATA_URL = "data.json";
         
-        // വെബ്സൈറ്റ് ഓപ്പൺ ആകുമ്പോൾ മിന്നൽ വേഗത്തിൽ JSON ഫയലിൽ നിന്നും ഡാറ്റ എടുക്കുന്നു
         const storeDataFetchPromise = fetch(DATA_URL + "?t=" + Date.now())
             .then(res => res.json())
             .catch(err => { console.error("Error fetching data:", err); return null; });
-        // ------------------------------------
 
         const DEFAULT_SHEET_COUPONS = [
             { 'Coupon Code': 'WELCOME20', 'Discount Type': 'Fixed', 'Discount Value': 20, 'Minimum Order Amount': 100, 'Status': 'Active' }
@@ -590,7 +583,7 @@
         let currentSort = "default";
         let searchQuery = "";
         let currentPage = 1;
-        const ITEMS_PER_PAGE = 12; // Speed Optimization: Show 12 items initially to boost LCP score
+        const ITEMS_PER_PAGE = 12;
         let appliedCouponCode = "";
         let discountAmount = 0;
         let currentActiveProductId = null;
@@ -598,18 +591,19 @@
         let bannerIntervals = [];
         let currentDetailMediaList = [];
         let currentDetailMediaIdx = 0;
-        
-        let isStoreRendered = false; // Lazy Rendering: Facebook Ad വഴി വരുമ്പോൾ ഹോം പേജ് ലോഡ് ആവാതിരിക്കാൻ
+        let isStoreRendered = false;
 
         function saveCartToStorage() {
             localStorage.setItem('hadkart_cart', JSON.stringify(cart));
         }
 
+        // Fixed infinite loading screen issue
         function hidePageLoader() {
             const loader = document.getElementById('pageLoader');
-            if (loader && !loader.classList.contains('opacity-0')) {
-                loader.classList.add('opacity-0', 'pointer-events-none');
-                setTimeout(() => { loader.style.display = 'none'; }, 500);
+            if (loader) {
+                loader.style.opacity = '0';
+                loader.style.pointerEvents = 'none';
+                setTimeout(() => { loader.style.display = 'none'; }, 300);
             }
         }
 
@@ -897,7 +891,6 @@
                 if (updateHash) window.location.hash = 'store';
                 updateDynamicMetaTags("hadkart - Digital, Physical & Service Store", "Professional architectural designs, digital guides, and lifestyle products.", "https://hadkart.com/logo.png");
                 
-                // ഹോം പേജ് ആദ്യമായിട്ടാണ് എടുക്കുന്നതെങ്കിൽ മാത്രം പ്രൊഡക്റ്റുകൾ റെൻഡർ ചെയ്യുക (Lazy Rendering)
                 if (!isStoreRendered) {
                     renderBanners(); 
                     renderProducts();
@@ -943,13 +936,12 @@
                         updateCartUI();
                         hidePageLoader();
                     } else {
-                        // ബാക്ക്ഗ്രൗണ്ടിൽ ഡാറ്റ അപ്‌ഡേറ്റ് ചെയ്യുമ്പോൾ, കസ്റ്റമർ ഹോം പേജിലാണെങ്കിൽ മാത്രം അത് കാണിക്കുക
                         if (!hash || hash === '#store') {
                             renderBanners();
                             renderProducts();
                             isStoreRendered = true;
                         } else {
-                            isStoreRendered = false; // കസ്റ്റമർ ഹോം പേജിലേക്ക് തിരികെ പോകുമ്പോൾ മാത്രം ലോഡ് ആക്കാൻ
+                            isStoreRendered = false;
                         }
                     }
                 } else {
@@ -1517,8 +1509,8 @@
                     <div id="detailMediaWrapper" class="bg-[#f5f5f7] rounded-2xl overflow-hidden flex items-center justify-center relative touch-pan-y aspect-square">
                         ${badgeText ? `<span class="absolute top-4 left-4 z-10 ${badgeColor} text-white text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md">${badgeText}</span>` : ''}
                         ${hasMultipleMedia ? `
-                            <button onclick="setDetailMediaSlide(currentDetailMediaIdx - 1)" class="absolute left-3 z-10 w-8 h-8 rounded-full bg-white/85 hover:bg-white shadow-md flex items-center justify-center text-slate-700"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                            <button onclick="setDetailMediaSlide(currentDetailMediaIdx + 1)" class="absolute right-3 z-10 w-8 h-8 rounded-full bg-white/85 hover:bg-white shadow-md flex items-center justify-center text-slate-700"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                            <button onclick="setDetailMediaSlide(currentDetailMediaIdx - 1)" class="absolute left-3 z-10 w-8 h-8 rounded-full bg-white/85 hover:bg-white shadow-md flex items-center justify-center text-slate-700 transition hover:scale-110"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <button onclick="setDetailMediaSlide(currentDetailMediaIdx + 1)" class="absolute right-3 z-10 w-8 h-8 rounded-full bg-white/85 hover:bg-white shadow-md flex items-center justify-center text-slate-700 transition hover:scale-110"><i class="fa-solid fa-chevron-right text-xs"></i></button>
                         ` : ''}
                         <div id="detailMediaStage" class="w-full h-full flex items-center justify-center">
                             ${renderMediaSlideElement(currentDetailMediaList[0], product['Product Name'])}
@@ -1529,7 +1521,7 @@
                             ${currentDetailMediaList.map((mUrl, idx) => `
                                 <div onclick="setDetailMediaSlide(${idx})" class="thumbnail-item relative w-16 h-16 shrink-0 rounded-lg cursor-pointer border-2 ${idx === 0 ? 'border-[#0071e3] opacity-100' : 'border-transparent opacity-60 hover:opacity-100'} transition-all overflow-hidden bg-slate-100">
                                     <img src="${optimizeImageUrl(getThumbUrl(mUrl), 150)}" class="w-full h-full object-cover">
-                                    ${isVideoUrl(mUrl) ? `<div class="absolute inset-0 bg-black/30 flex items-center justify-center"><i class="fa-solid fa-play text-white text-xs"></i></div>` : ''}
+                                    ${isVideoUrl(mUrl) ? `<div class="absolute inset-0 bg-black/40 flex items-center justify-center"><i class="fa-solid fa-play text-white text-xs"></i></div>` : ''}
                                 </div>
                             `).join('')}
                         </div>
@@ -1597,7 +1589,7 @@
                     const pImg = optimizeImageUrl(getFirstImage(p), 300);
                     return `
                         <div onclick="viewProductDetail('${p['Product ID']}')" class="apple-card bg-white p-3.5 cursor-pointer min-w-[200px] max-w-[200px] flex-shrink-0 flex flex-col justify-between relative">
-                            <div class="relative h-32 bg-slate-100 rounded-xl overflow-hidden mb-3">
+                            <div class="relative aspect-square bg-slate-100 rounded-xl overflow-hidden mb-3">
                                 <img src="${pImg}" class="w-full h-full object-cover" loading="lazy">
                                 ${pBadge ? `<span class="absolute top-2 left-2 ${pBadgeColor} text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase">${pBadge}</span>` : ''}
                             </div>
@@ -1627,13 +1619,27 @@
             container.classList.remove('hidden');
             grid.innerHTML = filteredRecent.map(p => {
                 const pSale = parsePrice(p['Sale Price']);
+                const pBadge = getBadgeText(p);
+                const pBadgeColor = getBadgeColorClass(p);
                 const pImg = optimizeImageUrl(getFirstImage(p), 300);
+                const pId = p['Product ID'];
                 return `
-                    <div onclick="viewProductDetail('${p['Product ID']}')" class="apple-card bg-white p-3.5 cursor-pointer min-w-[190px] max-w-[190px] flex-shrink-0 flex flex-col justify-between">
-                        <img src="${pImg}" class="w-full aspect-square object-cover rounded-xl mb-2.5" loading="lazy">
+                    <div onclick="viewProductDetail('${pId}')" class="apple-card bg-white p-3.5 cursor-pointer min-w-[200px] max-w-[200px] flex-shrink-0 flex flex-col justify-between relative">
+                        <div class="relative aspect-square bg-slate-100 rounded-xl overflow-hidden mb-3">
+                            <img src="${pImg}" class="w-full h-full object-cover" loading="lazy">
+                            ${pBadge ? `<span class="absolute top-2 left-2 ${pBadgeColor} text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase">${pBadge}</span>` : ''}
+                        </div>
                         <div>
                             <h4 class="font-semibold text-xs text-[#1d1d1f] line-clamp-1">${p['Product Name']}</h4>
-                            <div class="text-xs font-semibold text-slate-600 mt-0.5">₹${pSale.toLocaleString('en-IN')}</div>
+                            <div class="text-xs font-semibold text-[#0071e3] mt-1">₹${pSale.toLocaleString('en-IN')}</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5 mt-3 pt-2 border-t border-slate-100">
+                            <button onclick="event.stopPropagation(); addToCart('${pId}')" class="bg-[#e8e8ed] hover:bg-[#d2d2d7] text-[#1d1d1f] py-1.5 rounded-full text-[10px] font-semibold transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-bag-shopping text-[9px]"></i> Bag
+                            </button>
+                            <button onclick="event.stopPropagation(); buyNow('${pId}')" class="apple-btn py-1.5 text-[10px] font-semibold transition flex items-center justify-center">
+                                Buy
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1691,7 +1697,7 @@
         }
 
         function copyCurrentProductLink() {
-            The currentUrl = window.location.href;
+            const currentUrl = window.location.href;
             navigator.clipboard.writeText(currentUrl).then(() => {
                 alert("Product link copied to clipboard!");
             });
@@ -1755,13 +1761,13 @@
 
                 if (isEligible) {
                     return `
-                        <div onclick="selectAndApplyCoupon('${code}')" class="min-w-[155px] max-w-[155px] p-2.5 rounded-xl border ${isApplied ? 'border-[#34c759] bg-emerald-50/60' : 'border-[#0071e3]/40 bg-blue-50/40 hover:bg-blue-50'} flex flex-col justify-between shrink-0 cursor-pointer transition">
+                        <div onclick="selectAndApplyCoupon('${code}')" class="p-2.5 rounded-xl border ${isApplied ? 'border-[#34c759] bg-emerald-50/60' : 'border-[#0071e3]/40 bg-blue-50/40 hover:bg-blue-50'} flex flex-col justify-between cursor-pointer transition">
                             <div>
                                 <div class="flex items-center justify-between gap-1">
                                     <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#0071e3] text-white tracking-wider">${code}</span>
                                     <span class="text-[11px] font-bold text-[#1d1d1f]">${offerTitle}</span>
                                 </div>
-                                <p class="text-[10px] text-slate-500 mt-1.5">Orders above ₹${minOrder.toLocaleString('en-IN')}</p>
+                                <p class="text-[10px] text-slate-500 mt-1.5">Above ₹${minOrder.toLocaleString('en-IN')}</p>
                             </div>
                             <div class="mt-2 pt-1.5 border-t border-slate-200/60 text-center">
                                 <span class="text-[10px] font-semibold ${isApplied ? 'text-[#34c759]' : 'text-[#0071e3]'}">
@@ -1772,16 +1778,16 @@
                     `;
                 } else {
                     return `
-                        <div class="min-w-[155px] max-w-[155px] p-2.5 rounded-xl border border-slate-200 bg-[#f5f5f7] opacity-65 flex flex-col justify-between shrink-0 cursor-not-allowed select-none">
+                        <div class="p-2.5 rounded-xl border border-slate-200 bg-[#f5f5f7] opacity-65 flex flex-col justify-between cursor-not-allowed select-none">
                             <div>
                                 <div class="flex items-center justify-between gap-1">
                                     <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-300 text-slate-600 tracking-wider">${code}</span>
                                     <span class="text-[11px] font-bold text-slate-600">${offerTitle}</span>
                                 </div>
-                                <p class="text-[10px] text-slate-400 mt-1.5">Min. Order ₹${minOrder.toLocaleString('en-IN')}</p>
+                                <p class="text-[10px] text-slate-400 mt-1.5">Min ₹${minOrder.toLocaleString('en-IN')}</p>
                             </div>
                             <div class="mt-2 pt-1.5 border-t border-slate-200/60 text-center">
-                                <span class="text-[9px] font-medium text-[#ff9500]"><i class="fa-solid fa-lock mr-1"></i>Add ₹${neededMore.toLocaleString('en-IN')} more</span>
+                                <span class="text-[9px] font-medium text-[#ff9500]"><i class="fa-solid fa-lock mr-1"></i>Add ₹${neededMore.toLocaleString('en-IN')}</span>
                             </div>
                         </div>
                     `;
@@ -1799,7 +1805,7 @@
 
         function renderRecommendedInModals() {
             const cartItemIds = cart.map(i => String(i['Product ID']));
-            const availableRecs = allProducts.filter(p => !cartItemIds.includes(String(p['Product ID']))).slice(0, 6);
+            const availableRecs = allProducts.filter(p => !cartItemIds.includes(String(p['Product ID']))).slice(0, 4);
             const cartRecSec = document.getElementById('cartRecommendedSection');
             const cartRecList = document.getElementById('cartRecommendedList');
             const chkRecSec = document.getElementById('checkoutRecommendedSection');
@@ -1816,11 +1822,11 @@
                 const pid = p['Product ID'];
                 const img = optimizeImageUrl(getFirstImage(p), 150);
                 return `
-                    <div class="min-w-[135px] max-w-[135px] bg-[#f5f5f7] p-2 rounded-xl flex flex-col justify-between shrink-0 border border-slate-200/60">
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <img src="${img}" class="w-9 h-9 rounded-lg object-cover shrink-0">
+                    <div class="bg-[#f5f5f7] p-2.5 rounded-xl flex flex-col justify-between border border-slate-200/60">
+                        <div class="flex items-center gap-2 mb-2">
+                            <img src="${img}" class="w-10 h-10 rounded-lg object-cover shrink-0">
                             <div class="overflow-hidden">
-                                <h5 class="text-[10px] font-semibold text-[#1d1d1f] truncate">${p['Product Name']}</h5>
+                                <h5 class="text-[11px] font-semibold text-[#1d1d1f] truncate">${p['Product Name']}</h5>
                                 <div class="text-[10px] font-bold text-[#0071e3]">₹${price.toLocaleString('en-IN')}</div>
                             </div>
                         </div>
