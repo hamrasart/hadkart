@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="logo.png">
     
     <!-- SPEED OPTIMIZATION 3: Static Local CSS (For 90+ Score) -->
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
     
     <!-- SPEED OPTIMIZATION 4: Asynchronous FontAwesome loading (Zero Render Blocking) -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -590,7 +590,7 @@
         let currentSort = "default";
         let searchQuery = "";
         let currentPage = 1;
-        const ITEMS_PER_PAGE = 24; 
+        const ITEMS_PER_PAGE = 12; // Speed Optimization: Show 12 items initially to boost LCP score
         let appliedCouponCode = "";
         let discountAmount = 0;
         let currentActiveProductId = null;
@@ -2428,7 +2428,7 @@
     <script>
         const swCode = `
             const CACHE_NAME = 'hadkart-v4-cache';
-            const urlsToCache = ['/', '/logo.png', 'https://cdn.tailwindcss.com'];
+            const urlsToCache = ['/', '/logo.png', '/style.css'];
             self.addEventListener('install', event => {
                 self.skipWaiting();
                 event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache).catch(err=>console.log(err))));
