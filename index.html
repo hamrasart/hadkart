@@ -598,6 +598,8 @@
         let bannerIntervals = [];
         let currentDetailMediaList = [];
         let currentDetailMediaIdx = 0;
+        
+        let isStoreRendered = false; // Lazy Rendering: Facebook Ad വഴി വരുമ്പോൾ ഹോം പേജ് ലോഡ് ആവാതിരിക്കാൻ
 
         function saveCartToStorage() {
             localStorage.setItem('hadkart_cart', JSON.stringify(cart));
@@ -879,6 +881,32 @@
             return false;
         }
 
+        function showSection(sec, updateHash = true) {
+            document.getElementById('storeSection').classList.add('hidden');
+            document.getElementById('productDetailSection').classList.add('hidden');
+            document.getElementById('accountSection').classList.add('hidden');
+            document.getElementById('legalSection').classList.add('hidden');
+
+            const stickyBar = document.getElementById('mobileStickyBuyBar');
+            const waFloat = document.getElementById('floatingWaContainer');
+            if (stickyBar) stickyBar.classList.add('hidden');
+            if (waFloat) waFloat.classList.replace('bottom-20', 'bottom-6');
+
+            if (sec === 'store') {
+                document.getElementById('storeSection').classList.remove('hidden');
+                if (updateHash) window.location.hash = 'store';
+                updateDynamicMetaTags("hadkart - Digital, Physical & Service Store", "Professional architectural designs, digital guides, and lifestyle products.", "https://hadkart.com/logo.png");
+                
+                // ഹോം പേജ് ആദ്യമായിട്ടാണ് എടുക്കുന്നതെങ്കിൽ മാത്രം പ്രൊഡക്റ്റുകൾ റെൻഡർ ചെയ്യുക (Lazy Rendering)
+                if (!isStoreRendered) {
+                    renderBanners(); 
+                    renderProducts();
+                    isStoreRendered = true;
+                }
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function handleInitialLoad() {
             const hasCache = loadCachedStoreData();
             const hash = window.location.hash;
@@ -894,10 +922,7 @@
                 hidePageLoader(); 
             }
             
-            // --- 🚀 പുതുതായി ആഡ് ചെയ്ത ഭാഗം ---
-            // JSON ഡാറ്റ പ്രോസസ്സ് ചെയ്യാൻ:
             storeDataFetchPromise.then(data => {
-                // ഡാറ്റ ഉണ്ടോ എന്ന് ചെക്ക് ചെയ്യുന്നു
                 if (data && (data.status === "success" || data.products)) {
                     allProducts = (data.products || []).filter(p => p['Product ID'] || p['Product Name']);
                     allBanners = data.banners || [];
@@ -918,9 +943,13 @@
                         updateCartUI();
                         hidePageLoader();
                     } else {
+                        // ബാക്ക്ഗ്രൗണ്ടിൽ ഡാറ്റ അപ്‌ഡേറ്റ് ചെയ്യുമ്പോൾ, കസ്റ്റമർ ഹോം പേജിലാണെങ്കിൽ മാത്രം അത് കാണിക്കുക
                         if (!hash || hash === '#store') {
                             renderBanners();
                             renderProducts();
+                            isStoreRendered = true;
+                        } else {
+                            isStoreRendered = false; // കസ്റ്റമർ ഹോം പേജിലേക്ക് തിരികെ പോകുമ്പോൾ മാത്രം ലോഡ് ആക്കാൻ
                         }
                     }
                 } else {
@@ -1666,27 +1695,6 @@
             navigator.clipboard.writeText(currentUrl).then(() => {
                 alert("Product link copied to clipboard!");
             });
-        }
-
-        function showSection(sec, updateHash = true) {
-            document.getElementById('storeSection').classList.add('hidden');
-            document.getElementById('productDetailSection').classList.add('hidden');
-            document.getElementById('accountSection').classList.add('hidden');
-            document.getElementById('legalSection').classList.add('hidden');
-
-            const stickyBar = document.getElementById('mobileStickyBuyBar');
-            const waFloat = document.getElementById('floatingWaContainer');
-            if (stickyBar) stickyBar.classList.add('hidden');
-            if (waFloat) waFloat.classList.replace('bottom-20', 'bottom-6');
-
-            if (sec === 'store') {
-                document.getElementById('storeSection').classList.remove('hidden');
-                if (updateHash) window.location.hash = 'store';
-                updateDynamicMetaTags("hadkart - Digital, Physical & Service Store", "Professional architectural designs, digital guides, and lifestyle products.", "https://hadkart.com/logo.png");
-                renderBanners(); 
-                renderProducts();
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function addToCart(id) {
