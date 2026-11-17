@@ -14,29 +14,25 @@
     <meta property="og:url" id="ogUrl" content="https://hadkart.com">
     <meta name="twitter:card" content="summary_large_image">
 
-    <!-- SPEED OPTIMIZATION 1: Preconnect & DNS Prefetch to Google Servers -->
+    <!-- Preconnect & DNS Prefetch to Google Servers -->
     <link rel="preconnect" href="https://script.google.com" crossorigin>
     <link rel="dns-prefetch" href="https://script.google.com">
     <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
-    <link rel="preconnect" href="https://wsrv.nl" crossorigin> <!-- Image CDN -->
+    <link rel="preconnect" href="https://wsrv.nl" crossorigin>
 
-    <!-- SPEED OPTIMIZATION 2: Ultra-fast Preload for Logo -->
+    <!-- Ultra-fast Preload for Logo -->
     <link rel="preload" as="image" href="logo.png" fetchpriority="high">
     
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
     
-    <!-- SPEED OPTIMIZATION 3: Static Local CSS (For 90+ Score) -->
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- SPEED OPTIMIZATION 4: Asynchronous FontAwesome loading (Zero Render Blocking) -->
+    <!-- FontAwesome Loading -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     
-    <!-- SPEED OPTIMIZATION 5: Deferred Non-Critical Scripts -->
+    <!-- Deferred Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 
-    <!-- SPEED OPTIMIZATION 6: Delayed Meta Pixel (Loads only after 3.5 seconds) -->
     <script>
         window.addEventListener('load', function() {
             setTimeout(function() {
@@ -54,7 +50,6 @@
         });
     </script>
 
-    <!-- Custom Store Event Tracking -->
     <script>
         const META_PIXEL_ID = "2316930835708318"; 
         const GA_MEASUREMENT_ID = ""; 
@@ -98,8 +93,6 @@
         .logo-breathe { animation: breathe 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         .touch-pan-y { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
         .slider-track { will-change: transform; }
-        
-        /* Speed Optimization: Hides non-visible cards */
         .content-visibility-auto { content-visibility: auto; contain-intrinsic-size: 320px; }
     </style>
 </head>
@@ -883,7 +876,7 @@
             const stickyBar = document.getElementById('mobileStickyBuyBar');
             const waFloat = document.getElementById('floatingWaContainer');
             if (stickyBar) stickyBar.classList.add('hidden');
-            if (waFloat) waFloat.classList.replace('bottom-20', 'bottom-6');
+            if (waFloat) { waFloat.classList.remove('bottom-20'); waFloat.classList.add('bottom-6'); }
 
             if (sec === 'store') {
                 document.getElementById('storeSection').classList.remove('hidden');
@@ -1498,7 +1491,7 @@
                 document.getElementById('stickyAddBagBtn').onclick = () => { addToCart(product['Product ID']); openCartModal(); };
                 document.getElementById('stickyBuyNowBtn').onclick = () => { buyNow(product['Product ID']); };
                 stickyBar.classList.remove('hidden');
-                if (waFloat) waFloat.classList.replace('bottom-6', 'bottom-20');
+                if (waFloat) { waFloat.classList.remove('bottom-6'); waFloat.classList.add('bottom-20'); }
             }
 
             const hasMultipleMedia = currentDetailMediaList.length > 1;
@@ -2436,12 +2429,11 @@
         }
     </script>
     
-    <!-- SPEED OPTIMIZATION 7: Zero-File Service Worker (PWA Offline Cache Magic) -->
-    <!-- This allows your site to load offline or on extremely slow networks without creating a separate sw.js file! -->
+    <!-- PWA Offline Cache Service Worker -->
     <script>
         const swCode = `
-            const CACHE_NAME = 'hadkart-v4-cache';
-            const urlsToCache = ['/', '/logo.png', '/style.css'];
+            const CACHE_NAME = 'hadkart-v5-cache';
+            const urlsToCache = ['/', '/logo.png'];
             self.addEventListener('install', event => {
                 self.skipWaiting();
                 event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache).catch(err=>console.log(err))));
