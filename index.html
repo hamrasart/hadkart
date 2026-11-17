@@ -73,19 +73,6 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased pb-16 md:pb-0">
 
-    <!-- Initial Breathing Logo Loading Overlay -->
-    <div id="pageLoader" class="fixed inset-0 z-[100] bg-[#f5f5f7] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="relative flex flex-col items-center">
-            <img src="logo.png" onerror="this.src='https://via.placeholder.com/80/0071e3/ffffff?text=H'" alt="hadkart loading" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover logo-breathe">
-            <span class="mt-4 text-sm font-semibold tracking-tight text-[#1d1d1f] lowercase">hadkart</span>
-            <div class="mt-2 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 0ms;"></span>
-                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 150ms;"></span>
-                <span class="w-1.5 h-1.5 rounded-full bg-[#0071e3] animate-bounce" style="animation-delay: 300ms;"></span>
-            </div>
-        </div>
-    </div>
-
     <!-- Top Contact Banner -->
     <div class="bg-[#1d1d1f] text-[#f5f5f7] text-xs py-2 px-4 text-center font-normal flex flex-col sm:flex-row items-center justify-center gap-2 md:sticky md:top-0 md:z-50">
         <span class="font-light">Looking for 3D plans, Home design or Construction works?</span>
@@ -139,7 +126,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
 
         <!-- STORE SECTION -->
-        <div id="storeSection" class="hidden">
+        <div id="storeSection">
             <!-- TOP BANNERS -->
             <div id="topBannersWrapper" class="mb-10 space-y-4">
                 <div id="topMainBannerContainer" class="touch-pan-y">
@@ -867,22 +854,11 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Robust initial loading logic to guarantee cache/fetch sync and remove loader
+        // Optimized initial loading to instantly remove loader
         function handleInitialLoad() {
             const hasCache = loadCachedStoreData();
             const hash = window.location.hash;
             
-            if (hasCache) {
-                if (hash.startsWith('#product=')) {
-                    const prodId = hash.replace('#product=', '');
-                    viewProductDetail(prodId, false);
-                } else {
-                    showSection('store', false); 
-                }
-                updateCartUI();
-                hidePageLoader();
-            }
-
             storeDataFetchPromise.then(data => {
                 if (data && (data.status === "success" || data.products)) {
                     allProducts = (data.products || []).filter(p => p['Product ID'] || p['Product Name']);
@@ -893,31 +869,25 @@
                     localStorage.setItem('hadkart_store_cache_v3', JSON.stringify({
                         products: allProducts, banners: allBanners, coupons: allCoupons, ads: allAds
                     }));
-                    
-                    if (!hasCache) {
-                        if (hash.startsWith('#product=')) {
-                            const prodId = hash.replace('#product=', '');
-                            viewProductDetail(prodId, false);
-                        } else {
-                            showSection('store', false);
-                        }
-                        updateCartUI();
-                        hidePageLoader();
-                    } else {
-                        if (hash.startsWith('#product=')) {
-                            viewProductDetail(hash.replace('#product=', ''), false);
-                        } else if (!isStoreRendered && (!hash || hash === '#store')) {
-                            renderBanners();
-                            renderProducts();
-                            isStoreRendered = true;
-                        }
-                    }
-                } else {
-                    if (!hasCache) hidePageLoader();
                 }
-            }).catch(err => {
-                console.error("Fetch failed:", err);
-                if (!hasCache) hidePageLoader();
+
+                if (hash.startsWith('#product=')) {
+                    const prodId = hash.replace('#product=', '');
+                    viewProductDetail(prodId, false);
+                } else {
+                    showSection('store', false);
+                }
+                updateCartUI();
+                hidePageLoader();
+            }).catch(() => {
+                loadCachedStoreData();
+                if (hash.startsWith('#product=')) {
+                    viewProductDetail(hash.replace('#product=', ''), false);
+                } else {
+                    showSection('store', false);
+                }
+                updateCartUI();
+                hidePageLoader();
             });
         }
 
