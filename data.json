@@ -311,15 +311,6 @@
       "Status": "Active"
     },
     {
-      "Banner ID": "BN005",
-      "Banner Section": "Top-2",
-      "Slide Order": "3",
-      "Banner Title": "Footer Support & Contact Banner",
-      "Image URL": "https://hadkart.com/banners/bottom2-support.jpg",
-      "Redirect URL": "https://hadkart.com/#contact",
-      "Status": "Inactive"
-    },
-    {
       "Banner ID": "BN006",
       "Banner Section": "Bottom-1",
       "Slide Order": "1",
@@ -363,24 +354,6 @@
       "Image URL": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSfeY1H0-VGda6fw3izRqDlUVuACyfPK-zR2lDhTkeInHqYcQDXdb-PF9kjjv0rYGUSlYn1Yj-AXEUf20XxoPydtRb8EPisnWBPk7LDyHHnAbYnUCXpX5MbHTMf-rkomDAUtook3TcjI7JLiILAHlRwE4MCgtMks-nuocp8DNemu0WSbUHJRlDAcJaGqYS/s1600/erase_8_instagram.jpg",
       "Redirect URL": "https://instagram.com/hamrasart",
       "Status": "Active"
-    },
-    {
-      "Banner ID": "BN011",
-      "Banner Section": "Top-2",
-      "Slide Order": "3",
-      "Banner Title": "interior work",
-      "Image URL": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCtrJTAoUqQ2mW7F3zrqdOPOjFH0zoBtJzDWjXr9rMpG5Nbr5C4I_0OOqgSD4WeeBHmxFA1M0Hg642SQeuZOTv6_jgco-wjcB7yq_vklEIW_4MtTy0Cyi0QyD3B4PII8h81ng4fpquvkblZ3lzTVFQ-9doYcVdwisFo1CCRER0N9N-pan0csxzkcret5LD/s1600/Gemini_Generated_Image_143yyk143yyk143y-this-images-have-some-gemini-logos-please-remove-t.jpg",
-      "Redirect URL": "https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20discuss%20regarding%20interior%20design%20works",
-      "Status": "Inactive"
-    },
-    {
-      "Banner ID": "BN012",
-      "Banner Section": "Bottom-2",
-      "Slide Order": "3",
-      "Banner Title": "interior work",
-      "Image URL": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCtrJTAoUqQ2mW7F3zrqdOPOjFH0zoBtJzDWjXr9rMpG5Nbr5C4I_0OOqgSD4WeeBHmxFA1M0Hg642SQeuZOTv6_jgco-wjcB7yq_vklEIW_4MtTy0Cyi0QyD3B4PII8h81ng4fpquvkblZ3lzTVFQ-9doYcVdwisFo1CCRER0N9N-pan0csxzkcret5LD/s1600/Gemini_Generated_Image_143yyk143yyk143y-this-images-have-some-gemini-logos-please-remove-t.jpg",
-      "Redirect URL": "https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20discuss%20regarding%20interior%20design%20works",
-      "Status": "Inactive"
     },
     {
       "Banner ID": "BN013",
@@ -460,6 +433,20 @@
       "Discount Type": "Percentage",
       "Discount Value": "25",
       "Minimum Order Amount": "₹2,999",
+      "Status": "Active"
+    }
+  ],
+  "ads": [
+    {
+      "Ad ID": "AD001",
+      "Image URL": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg0lwMN_UBWrY7W37WwpYcc-RjrOYnIhquwviBRefETVLRx9yYoyg2UijJDVa0n7RjHRmTk6XuGR5704mHZ4qcoqSBiVB2a39iNKFtk2FvbmtO7-vB5uGkqL-0-RFgWhWxgTCwB5STqtpCHQI8vBghVJ8wwX8SJ3J4dwev7jmnaLEqJJaRYGidjUMvPZ9Pq/s1600/image_20261110_184403-move-text-to-center-in-high-of-blue-box.jpg",
+      "Redirect URL": "https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20discuss%20regarding%20house%20design",
+      "Status": "Active"
+    },
+    {
+      "Ad ID": "AD002",
+      "Image URL": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgbsJh0GbVKxcryfdWOmVvA_PujwRtaaKkSJAnqv-Uq5s2ASGItVJlssfauQdgfKb3oczuDOcCvH6wAzw6wbM8m84N9MO1fTL9qJqK3gzzZVdG58RF1yaDSNqKedmNQf5m3PcAz9AOsNrbtBQNdschU24_TdoiBim6hKtBc-eZxlBuXJ_ey9SXnN_lcoDkG/s1600/Gemini_Generated_Image_mj1s5zmj1s5zmj1s-remove-gemini-logo.jpg",
+      "Redirect URL": "https://wa.me/917907383944?text=Hi%20hadkart,%20I%20want%20to%20discuss%20regarding%20interior%20design%20works",
       "Status": "Active"
     }
   ]
