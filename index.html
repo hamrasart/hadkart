@@ -561,12 +561,19 @@
     <!-- JavaScript Application Logic -->
     <script>
         const RAZORPAY_LIVE_KEY = "rzp_live_3crrlxJYnfWJo9"; 
+        
+        // --- 🚀 പുതുതായി ആഡ് ചെയ്ത ഭാഗം ---
+        // ലോഗിൻ ചെയ്യാനും ഓർഡർ കൊടുക്കാനും പഴയ ഗൂഗിൾ ഷീറ്റ് ലിങ്ക് തന്നെ വേണം:
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzewUuTZVNQwWDrEk0xqOuxC84OaUahGgYvsPysdsuYT5Hoe-60VBVqD1YtPFpkREbjyQ/exec";
         
-        // Starts fetching data IMMEDIATELY
-        const storeDataFetchPromise = fetch(SCRIPT_URL + "?action=getStoreData&t=" + Date.now())
+        // പ്രൊഡക്റ്റുകൾ സ്ക്രീനിൽ കാണിക്കാൻ മാത്രം ഗിറ്റ്ഹബ്ബിലെ JSON ഫയൽ ഉപയോഗിക്കുന്നു (ഇതാണ് സ്പീഡ് കൂട്ടുന്നത്):
+        const DATA_URL = "data.json";
+        
+        // വെബ്സൈറ്റ് ഓപ്പൺ ആകുമ്പോൾ മിന്നൽ വേഗത്തിൽ JSON ഫയലിൽ നിന്നും ഡാറ്റ എടുക്കുന്നു
+        const storeDataFetchPromise = fetch(DATA_URL + "?t=" + Date.now())
             .then(res => res.json())
             .catch(err => { console.error("Error fetching data:", err); return null; });
+        // ------------------------------------
 
         const DEFAULT_SHEET_COUPONS = [
             { 'Coupon Code': 'WELCOME20', 'Discount Type': 'Fixed', 'Discount Value': 20, 'Minimum Order Amount': 100, 'Status': 'Active' }
@@ -746,7 +753,6 @@
             return list.length ? list : ['https://via.placeholder.com/400x300?text=hadkart'];
         }
 
-        // SPEED OPTIMIZATION: Automatic Image Compression CDN
         function optimizeImageUrl(url, width = 600) {
             if (!url) return 'https://via.placeholder.com/400x300?text=hadkart';
             if (url.includes('via.placeholder.com')) return url; 
@@ -854,7 +860,6 @@
             }
         });
 
-        // Cache-First Direct Product Loading (Deep Linking)
         function loadCachedStoreData() {
             try {
                 const cached = localStorage.getItem('hadkart_store_cache_v3');
@@ -889,8 +894,11 @@
                 hidePageLoader(); 
             }
             
+            // --- 🚀 പുതുതായി ആഡ് ചെയ്ത ഭാഗം ---
+            // JSON ഡാറ്റ പ്രോസസ്സ് ചെയ്യാൻ:
             storeDataFetchPromise.then(data => {
-                if (data && data.status === "success") {
+                // ഡാറ്റ ഉണ്ടോ എന്ന് ചെക്ക് ചെയ്യുന്നു
+                if (data && (data.status === "success" || data.products)) {
                     allProducts = (data.products || []).filter(p => p['Product ID'] || p['Product Name']);
                     allBanners = data.banners || [];
                     allAds = data.ads || []; 
