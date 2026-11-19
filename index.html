@@ -2068,7 +2068,15 @@
                 "name": "hadkart",
                 "description": "Order Payment",
                 "image": "logo.png",
-                "handler": async function (response) {
+                "notes": {
+                    "name": String(name).slice(0, 200),
+                    "email": String(email).slice(0, 200),
+                    "phone": String(phone).slice(0, 50),
+                    "address": String(address).slice(0, 250),
+                    "itemIds": purchasedItemIds.join(","),
+                    "couponUsed": String(appliedCouponCode || "None"),
+                    "discountAmount": String(discountAmount || 0)
+                },"handler": async function (response) {
                     btn.disabled = true;
                     btn.textContent = "Verifying Order...";
                     await submitOrderBackend({
